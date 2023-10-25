@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/minacio00/easyCourt/types"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -30,18 +31,17 @@ func Connectdb() {
 	creds := dbCredentials{
 		client: "postgresql", user: "postgres",
 		password: "postgresql", port: "5432",
-		host:/*"db"*/ "localhost",
-		database: "go-adopet",
+		host:/*"db"*/ " 172.18.48.1",
+		database: "easyCourt",
 		ssl:      "disable",
 	}
-	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN: creds.formatStr(),
-	}), &gorm.Config{Logger: logger.Default.LogMode(logger.Error)})
+	db, err := gorm.Open(postgres.Open(creds.formatStr()), &gorm.Config{Logger: logger.Default.LogMode(logger.Error)})
 
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	// defer, disconect
 	db.Logger = logger.Default.LogMode(logger.Info)
-	db.AutoMigrate()
+	db.AutoMigrate(&types.Tenant{}, &types.Clube{}, &types.Quadra{}, &types.Cliente{}, &types.Reserva{})
 
 }
