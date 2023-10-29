@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/gofiber/fiber/v2"
+	server "github.com/minacio00/easyCourt/Server"
 	"github.com/minacio00/easyCourt/database"
 )
 
 func main() {
-	app := fiber.New()
+	// app := fiber.New()
+	app := server.SetRoutes()
 	database.Connectdb()
 	app.Listen(":8080")
 }

@@ -31,17 +31,18 @@ func Connectdb() {
 	creds := dbCredentials{
 		client: "postgresql", user: "postgres",
 		password: "postgresql", port: "5432",
-		host:/*"db"*/ " 172.18.48.1",
+		host:/*"db"*/ "172.18.48.1",
 		database: "easyCourt",
 		ssl:      "disable",
 	}
-	db, err := gorm.Open(postgres.Open(creds.formatStr()), &gorm.Config{Logger: logger.Default.LogMode(logger.Error)})
+	var err error
+	Db, err = gorm.Open(postgres.Open(creds.formatStr()), &gorm.Config{Logger: logger.Default.LogMode(logger.Error)})
 
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	// defer, disconect
-	db.Logger = logger.Default.LogMode(logger.Info)
-	db.AutoMigrate(&types.Tenant{}, &types.Clube{}, &types.Quadra{}, &types.Cliente{}, &types.Reserva{})
+	Db.Logger = logger.Default.LogMode(logger.Info)
+	Db.AutoMigrate(&types.Tenant{}, &types.Clube{}, &types.Quadra{}, &types.Cliente{}, &types.Reserva{})
 
 }

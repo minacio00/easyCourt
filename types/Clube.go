@@ -8,10 +8,11 @@ import (
 
 type Clube struct {
 	gorm.Model
-	TenantID uint      `gorm:"not null" json:"tenant_id"`
-	ClubName string    `gorm:"not null" json:"club_name"`
-	Quadras  []Quadra  `json:"quadras"`
-	Clientes []Cliente `json:"clientes"`
+	DeletedAt interface{} `gorm:"-"` // Ignore DeletedAt
+	TenantID  uint        `gorm:"not null" json:"tenant_id"`
+	ClubName  string      `gorm:"not null" json:"club_name"`
+	Quadras   []Quadra    `json:"quadras"`
+	Clientes  []Cliente   `json:"clientes"`
 }
 
 func (c *Clube) Validate() error {
