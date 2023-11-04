@@ -81,6 +81,6 @@ func DeleteReserva(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(404).JSON(struct{ Message string }{Message: err.Error()})
 	}
-	database.Db.Delete(&reserva)
+	database.Db.Unscoped().Delete(&reserva)
 	return c.SendStatus(204)
 }

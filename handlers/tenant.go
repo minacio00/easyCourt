@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/minacio00/easyCourt/database"
 	"github.com/minacio00/easyCourt/types"
+	dtos "github.com/minacio00/easyCourt/types/DTOs"
 )
 
 func CreateTenant(c *fiber.Ctx) error {
@@ -22,18 +23,20 @@ func CreateTenant(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(struct{ Message string }{Message: err.Error()})
 	}
-
-	return c.Status(201).JSON(&tenant)
+	tenantDto := &dtos.ReadTenantDTO{}
+	json.Unmarshal(c.Body(), tenantDto)
+	return c.Status(201).JSON(&tenantDto)
 }
 
 // todo: fazer dto
 func ReadTenant(c *fiber.Ctx) error {
-	tenant := &types.Tenant{}
+	tenant := &dtos.ReadTenantDTO{}
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(500).JSON(struct{ Message string }{Message: err.Error()})
 	}
-	err = database.Db.Preload("clubes").First(&tenant, id).Error
+	// err = database.Db.Preload("clubes").First(&tenant, id).Error
+	err = database.Db.Model(&types.Tenant{}).First(&tenant, id).Error
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(struct{ Message string }{Message: err.Error()})
 	}
@@ -84,6 +87,10 @@ func DeleteTenant(c *fiber.Ctx) error {
 	err = database.Db.First(&tenant, "id = ?", id).Error
 	if err != nil {
 		return c.Status(404).JSON(struct{ Message string }{Message: err.Error()})
+	}
+	err = database.Db.Unscoped().Delete(&tenant).Error
+	if err != nil {
+		return c.Status(500).JSON(struct{ Message string }{Message: err.Error()})
 	}
 	return c.SendStatus(204)
 

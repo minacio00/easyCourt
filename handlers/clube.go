@@ -85,6 +85,6 @@ func DeleteClube(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(404).JSON(struct{ Message string }{Message: err.Error()})
 	}
-	database.Db.Delete(&clube)
+	database.Db.Unscoped().Delete(&clube)
 	return c.SendStatus(204)
 }

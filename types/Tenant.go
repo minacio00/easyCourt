@@ -15,7 +15,7 @@ type Tenant struct {
 	Email       string      `gorm:"not null" json:"email"`
 	Password    string      `gorm:"not null" json:"password"`
 	TrialPeriod bool        `gorm:"not null" json:"periodo_teste"`
-	Clube       Clube       `gorm:"null constraint:OnUpdate:CASCADE OnDelete:CASCADE;"`
+	Clube       []Clube     `gorm:"null constraint:OnUpdate:CASCADE OnDelete:CASCADE;"`
 }
 
 func (t *Tenant) Validate() error {

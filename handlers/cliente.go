@@ -81,6 +81,6 @@ func DeleteCliente(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(404).JSON(struct{ Message string }{Message: err.Error()})
 	}
-	database.Db.Delete(&cliente)
+	database.Db.Unscoped().Delete(&cliente)
 	return c.SendStatus(204)
 }

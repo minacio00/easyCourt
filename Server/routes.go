@@ -2,11 +2,20 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/minacio00/easyCourt/handlers"
 )
 
 func SetRoutes() *fiber.App {
 	app := fiber.New()
+
+	app.Use(cors.New(cors.ConfigDefault))
+	// app.Use(func(c *fiber.Ctx) error {
+	// 	c.Set("Access-Control-Allow-Origin", "*")
+	// 	c.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+	// 	c.Set("Access-Control-Allow-Headers", "Content-Type")
+	// 	return c.Next()
+	// })
 
 	app.Post("/tenant", handlers.CreateTenant)
 	app.Get("/tenant/:id", handlers.ReadTenant)

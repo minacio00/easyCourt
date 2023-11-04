@@ -81,6 +81,6 @@ func DeleteQuadra(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(404).JSON(struct{ Message string }{Message: err.Error()})
 	}
-	database.Db.Delete(&quadra)
+	database.Db.Unscoped().Delete(&quadra)
 	return c.SendStatus(204)
 }
