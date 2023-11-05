@@ -12,8 +12,8 @@ import (
 
 func checkEmail(tenant *types.Tenant) error {
 	test := types.Tenant{}
-	database.Db.First(&test, "email = ?", &tenant.Email)
-	if test.Email == tenant.Email {
+	err := database.Db.First(&test, "email = ?", &tenant.Email).Error
+	if err == nil {
 		return errors.New("já existe um usuário com esse email")
 	}
 	return nil
@@ -22,7 +22,7 @@ func CreateTenant(c *fiber.Ctx) error {
 	tenant := &types.Tenant{}
 	err := json.Unmarshal(c.Body(), tenant)
 	if err != nil {
-		return c.Status(500).SendString(err.Error())
+		return c.Status(500).JSON(struct{ Message string }{Message: err.Error()})
 	}
 	err = tenant.Validate()
 	if err != nil {
@@ -36,8 +36,18 @@ func CreateTenant(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(struct{ Message string }{Message: err.Error()})
 	}
+
 	tenantDto := &dtos.ReadTenantDTO{}
-	json.Unmarshal(c.Body(), tenantDto)
+	jsonBytes, err := json.Marshal(tenant)
+	if err != nil {
+		return c.Status(500).JSON(struct{ Message string }{Message: err.Error()})
+	}
+
+	json.Unmarshal(jsonBytes, tenantDto)
+	if err != nil {
+		return c.Status(500).JSON(struct{ Message string }{Message: err.Error()})
+	}
+
 	return c.Status(201).JSON(&tenantDto)
 }
 

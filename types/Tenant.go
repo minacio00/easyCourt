@@ -4,18 +4,16 @@ import (
 	"errors"
 	"net/mail"
 	"strings"
-
-	"gorm.io/gorm"
 )
 
 type Tenant struct {
-	gorm.Model
-	DeletedAt   interface{} `gorm:"-"` // Ignore DeletedAt
-	Name        string      `gorm:"not null" json:"name"`
-	Email       string      `gorm:"not null" json:"email"`
-	Password    string      `gorm:"not null" json:"password"`
-	TrialPeriod bool        `gorm:"not null" json:"periodo_teste"`
-	Clube       []Clube     `gorm:"null constraint:OnUpdate:CASCADE OnDelete:CASCADE;"`
+	ID uint `gorm:"primarykey" json:"id"`
+	// DeletedAt   interface{} `gorm:"-"` // Ignore DeletedAt
+	Name        string  `gorm:"not null" json:"name"`
+	Email       string  `gorm:"not null" json:"email"`
+	Password    string  `gorm:"not null" json:"password"`
+	TrialPeriod bool    `gorm:"not null" json:"periodo_teste"`
+	Clube       []Clube `gorm:"null constraint:OnUpdate:CASCADE OnDelete:CASCADE;"`
 }
 
 func (t *Tenant) Validate() error {
@@ -23,7 +21,7 @@ func (t *Tenant) Validate() error {
 
 	// Check if the name is empty
 	if t.Name == "" {
-		validationErrors = append(validationErrors, "Nome não pode ser vazio=")
+		validationErrors = append(validationErrors, "Nome não pode ser vazio")
 	}
 
 	// Check if the email is empty or invalid
