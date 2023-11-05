@@ -1,6 +1,8 @@
 package server
 
 import (
+	"log"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/minacio00/easyCourt/handlers"
@@ -9,6 +11,17 @@ import (
 func SetRoutes() *fiber.App {
 	app := fiber.New()
 
+	app.Use(func(c *fiber.Ctx) error {
+		if err := c.Next(); err != nil {
+			// Log the error
+			log.Printf("Error: %v", err)
+			log.Printf("Method: %v", c.Method())
+			// You can also log more details if needed, such as request information
+			// log.Printf("Error: %v, Path: %s, Method: %s", err, c.Path(), c.Method())
+			return err
+		}
+		return nil
+	})
 	app.Use(cors.New(cors.ConfigDefault))
 	// app.Use(func(c *fiber.Ctx) error {
 	// 	c.Set("Access-Control-Allow-Origin", "*")

@@ -3,9 +3,11 @@ package database
 import (
 	"database/sql"
 	"log"
+	"os"
 
 	"github.com/minacio00/easyCourt/types"
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -31,18 +33,24 @@ func Connectdb() {
 	creds := dbCredentials{
 		client: "postgresql", user: "postgres",
 		password: "postgresql", port: "5432",
-		host:/*"db"*/ "172.18.48.1",
-		database: "easyCourt",
+		host:/*"db"*/ "localhost",
+		database: "clubster",
 		ssl:      "disable",
 	}
 	var err error
-	Db, err = gorm.Open(postgres.Open(creds.formatStr()), &gorm.Config{Logger: logger.Default.LogMode(logger.Error)})
+	env := os.Getenv("APP_ENV")
+	if env == "test" {
+		Db, err = gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+		log.Println("connected to sqlite")
+	} else {
+		Db, err = gorm.Open(postgres.Open(creds.formatStr()), &gorm.Config{Logger: logger.Default.LogMode(logger.Error)})
+	}
 
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	// defer, disconect
-	Db.Logger = logger.Default.LogMode(logger.Info)
+	// Db.Logger = logger.Default.LogMode(logger.Info)
 	Db.AutoMigrate(&types.Tenant{}, &types.Clube{}, &types.Quadra{}, &types.Cliente{}, &types.Reserva{})
 
 }
