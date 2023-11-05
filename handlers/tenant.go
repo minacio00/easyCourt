@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/minacio00/easyCourt/database"
@@ -9,6 +10,14 @@ import (
 	dtos "github.com/minacio00/easyCourt/types/DTOs"
 )
 
+func checkEmail(tenant *types.Tenant) error {
+	test := types.Tenant{}
+	database.Db.First(&test, "email = ?", &tenant.Email)
+	if test.Email == tenant.Email {
+		return errors.New("já existe um usuário com esse email")
+	}
+	return nil
+}
 func CreateTenant(c *fiber.Ctx) error {
 	tenant := &types.Tenant{}
 	err := json.Unmarshal(c.Body(), tenant)
@@ -18,6 +27,10 @@ func CreateTenant(c *fiber.Ctx) error {
 	err = tenant.Validate()
 	if err != nil {
 		return c.Status(400).JSON(struct{ Message string }{Message: err.Error()}) // todo: debugar isso daqui
+	}
+	err = checkEmail(tenant)
+	if err != nil {
+		return c.Status(400).JSON(struct{ Message string }{Message: err.Error()})
 	}
 	err = database.Db.Create(tenant).Error
 	if err != nil {
