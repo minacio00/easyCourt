@@ -33,7 +33,7 @@ func Connectdb() {
 	creds := dbCredentials{
 		client: "postgresql", user: "postgres",
 		password: "postgresql", port: "5432",
-		host:/*"db"*/ "localhost",
+		host:     "db",
 		database: "clubster",
 		ssl:      "disable",
 	}
