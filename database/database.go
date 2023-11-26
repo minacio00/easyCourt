@@ -43,6 +43,7 @@ func Connectdb() {
 		Db, err = gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 		log.Println("connected to sqlite")
 	} else {
+		println("ai ai ai ai ai")
 		Db, err = gorm.Open(postgres.Open(creds.formatStr()), &gorm.Config{Logger: logger.Default.LogMode(logger.Error)})
 	}
 
