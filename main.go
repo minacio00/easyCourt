@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	swagger "github.com/gofiber/swagger"
 	server "github.com/minacio00/easyCourt/Server"
 	"github.com/minacio00/easyCourt/database"
@@ -14,7 +16,6 @@ func main() {
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
 	database.Connectdb()
-
-	app.Listen(":8080")
+	log.Fatal(app.Listen(":8080"))
 
 }

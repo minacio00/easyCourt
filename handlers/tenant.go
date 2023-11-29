@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/minacio00/easyCourt/database"
@@ -32,6 +34,22 @@ func CreateTenant(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON(struct{ Message string }{Message: err.Error()})
 	}
+
+	passwordDTO := struct {
+		Password string `json:"password"`
+		Hash     string `json:"hash"`
+	}{
+		Password: tenant.Password,
+	}
+	body, _ := json.Marshal(passwordDTO)
+	response, err := http.Post("http://easycourtuserservice:8081/api/hashPassword", "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+	json.NewDecoder(response.Body).Decode(&passwordDTO)
+	tenant.Password = passwordDTO.Password
+
 	err = database.Db.Create(tenant).Error
 	if err != nil {
 		return c.Status(500).JSON(struct{ Message string }{Message: err.Error()})
