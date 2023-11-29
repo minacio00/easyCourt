@@ -48,7 +48,7 @@ func CreateTenant(c *fiber.Ctx) error {
 	}
 	defer response.Body.Close()
 	json.NewDecoder(response.Body).Decode(&passwordDTO)
-	tenant.Password = passwordDTO.Password // todo: fix the api that is returning the hash in a field called password
+	tenant.Password = passwordDTO.Password
 
 	err = database.Db.Create(tenant).Error
 	if err != nil {
