@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -14,14 +15,15 @@ type Response struct {
 
 func StartServer() {
 	r := chi.NewRouter()
-
-	r.Use(middleware.Logger)
 	r.Use(middleware.AllowContentType("application/json"))
+	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: log.New(log.Writer(), "", log.LstdFlags), NoColor: false}))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		response := Response{Message: "Hello, World!"}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	})
+
+	log.Println("starting server on :8008")
 	http.ListenAndServe(":8080", r)
 }
