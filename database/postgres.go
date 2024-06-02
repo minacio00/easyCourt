@@ -5,8 +5,10 @@ import (
 	"log"
 
 	"github.com/minacio00/easyCourt/config"
+	"github.com/minacio00/easyCourt/internal/tenant"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type dbCreds struct {
@@ -37,10 +39,10 @@ func ConnectDb() {
 		sslmode:  "disable",
 	}
 
-	Db, err := gorm.Open(postgres.Open(creds.fmtString()), &gorm.Config{})
+	Db, err := gorm.Open(postgres.Open(creds.fmtString()), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
 	if err != nil {
 		log.Fatalf("Error connecting to the database: %s", err)
 	}
 
-	Db.AutoMigrate(&dbCreds{})
+	Db.AutoMigrate(&tenant.Tenant{})
 }
