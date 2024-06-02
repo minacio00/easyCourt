@@ -4,10 +4,18 @@ import "gorm.io/gorm"
 
 type Tenant struct {
 	gorm.Model
-	Email     string
-	FirstName string
-	Surname   string
-	StripeId  *string
-	FreeTrial *string
-	Password  *string
+	Email     string  `json:"email"`
+	FirstName string  `json:"firstName"`
+	Surname   string  `json:"surname"`
+	StripeId  *string `gorm:"->" json:"stripeId"`
+	FreeTrial *bool   `json:"freeTrial"`
+	Password  *string `json:"password"`
+}
+
+type CreateTenantType struct {
+	Email     string  `json:"email"`
+	FirstName string  `json:"firstName"`
+	Surname   string  `json:"surname"`
+	FreeTrial *string `json:"freeTrial"`
+	Password  *string `json:"password"`
 }

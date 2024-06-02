@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/minacio00/easyCourt/internal/tenant"
 )
 
 type Response struct {
@@ -23,6 +24,8 @@ func StartServer() {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	})
+
+	r.Post("/", tenant.CreateTenantHandler)
 
 	log.Println("starting server on :8008")
 	http.ListenAndServe(":8080", r)

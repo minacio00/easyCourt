@@ -39,7 +39,7 @@ func ConnectDb() {
 		sslmode:  "disable",
 	}
 
-	Db, err := gorm.Open(postgres.Open(creds.fmtString()), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
+	Db, err := gorm.Open(postgres.Open(creds.fmtString()), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
 		log.Fatalf("Error connecting to the database: %s", err)
 	}
