@@ -2,7 +2,6 @@ package tenant
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/minacio00/easyCourt/internal"
@@ -25,5 +24,6 @@ func CreateTenantHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newTn := tnService.CreateTenant(tenant)
-	log.Printf("Created tenant: %+v\n", newTn)
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(newTn)
 }

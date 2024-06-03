@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+
+	"github.com/iancoleman/strcase"
 )
 
 func CheckMissingFields(data interface{}) error {
@@ -17,6 +19,7 @@ func CheckMissingFields(data interface{}) error {
 		zeroValue := reflect.Zero(field.Type()).Interface()
 
 		if reflect.DeepEqual(field.Interface(), zeroValue) {
+			fieldName = strcase.ToLowerCamel(fieldName)
 			missingFields = append(missingFields, fieldName)
 		}
 	}

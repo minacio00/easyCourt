@@ -15,6 +15,8 @@ type Response struct {
 }
 
 func StartServer() {
+	tenant.Migrate()
+
 	r := chi.NewRouter()
 	r.Use(middleware.AllowContentType("application/json"))
 	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: log.New(log.Writer(), "", log.LstdFlags), NoColor: false}))

@@ -9,7 +9,7 @@ type Tenant struct {
 	Surname   string  `json:"surname"`
 	StripeId  *string `gorm:"->" json:"stripeId"`
 	FreeTrial *bool   `json:"freeTrial"`
-	Password  *string `json:"password"`
+	Password  *string `json:"-"`
 }
 
 type CreateTenantType struct {

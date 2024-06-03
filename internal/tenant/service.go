@@ -3,6 +3,7 @@ package tenant
 import (
 	"log"
 
+	"github.com/minacio00/easyCourt/database"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -13,7 +14,7 @@ func (tn *TenantService) CreateTenant(data *CreateTenantType) *Tenant {
 	trial := new(bool)
 	*trial = true
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(*data.Password), bcrypt.MaxCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(*data.Password), bcrypt.DefaultCost)
 	hashedPassword := string(hash)
 	if err != nil {
 		log.Fatalf("Error: %s", err.Error())
@@ -25,6 +26,9 @@ func (tn *TenantService) CreateTenant(data *CreateTenantType) *Tenant {
 		FreeTrial: trial,
 		Password:  &hashedPassword,
 	}
-
+	err = database.Db.Create(&tenant).Error
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 	return tenant
 }

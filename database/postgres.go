@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/minacio00/easyCourt/config"
-	"github.com/minacio00/easyCourt/internal/tenant"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -38,11 +37,9 @@ func ConnectDb() {
 		port:     config.PORT,
 		sslmode:  "disable",
 	}
-
-	Db, err := gorm.Open(postgres.Open(creds.fmtString()), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
+	var err error
+	Db, err = gorm.Open(postgres.Open(creds.fmtString()), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
 		log.Fatalf("Error connecting to the database: %s", err)
 	}
-
-	Db.AutoMigrate(&tenant.Tenant{})
 }
