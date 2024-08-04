@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/jinzhu/gorm"
+	"github.com/minacio00/easyCourt/internal/model"
 	"github.com/spf13/viper"
 )
 
@@ -28,5 +29,6 @@ func Init() {
 	if err != nil {
 		log.Fatalf("failed to connect to the database: %v", err)
 	}
+	DB.AutoMigrate(&model.Tenant{})
 
 }
