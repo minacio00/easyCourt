@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/minacio00/easyCourt/internal/model"
+	"gorm.io/gorm"
 )
 
 type TenantRepository interface {

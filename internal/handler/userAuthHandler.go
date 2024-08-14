@@ -1,4 +1,3 @@
-// easyCourt/internal/handler/tenant_auth_handler.go
 package handler
 
 import (
@@ -8,15 +7,15 @@ import (
 	"github.com/minacio00/easyCourt/internal/service"
 )
 
-type TenantAuthHandler struct {
-	service service.TenantService
+type UserAuthHandler struct {
+	service service.UserService
 }
 
-func NewTenantAuthHandler(service service.TenantService) *TenantAuthHandler {
-	return &TenantAuthHandler{service}
+func NewUserAuthHandler(service service.UserService) *UserAuthHandler {
+	return &UserAuthHandler{service}
 }
 
-func (h *TenantAuthHandler) Login(w http.ResponseWriter, r *http.Request) {
+func (h *UserAuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var credentials struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -27,11 +26,11 @@ func (h *TenantAuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tenant, err := h.service.Authenticate(credentials.Email, credentials.Password)
+	user, err := h.service.Authenticate(credentials.Email, credentials.Password)
 	if err != nil {
 		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
 		return
 	}
 
-	json.NewEncoder(w).Encode(tenant)
+	json.NewEncoder(w).Encode(user)
 }

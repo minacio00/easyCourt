@@ -16,20 +16,21 @@ func NewRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	tenantRepo := repository.NewTenantRepository(db.DB)
-	tenantService := service.NewTenantService(tenantRepo)
-	tenantHandler := handler.NewTenantHandler(tenantService)
-	tenantAuthHandler := handler.NewTenantAuthHandler(tenantService)
+	userRepo := repository.NewUserRepository(db.GetDB())
+	userService := service.NewUserService(userRepo)
+	userHandler := handler.NewUserHandler(userService)
+	userAuthHandler := handler.NewUserAuthHandler(userService)
 
-	r.Route("/tenants", func(r chi.Router) {
-		r.Post("/", tenantHandler.CreateTenant)
-		r.Get("/", tenantHandler.GetAllTenants)
-		r.Get("/{id}", tenantHandler.GetTenantByID)
-		r.Put("/{id}", tenantHandler.UpdateTenant)
-		r.Delete("/{id}", tenantHandler.DeleteTenant)
+	// Define routes
+	r.Route("/users", func(r chi.Router) {
+		r.Post("/", userHandler.CreateUser)
+		r.Get("/{id}", userHandler.GetUserByID)
+		r.Get("/", userHandler.GetAllUsers)
+		r.Put("/", userHandler.UpdateUser)
+		r.Delete("/{id}", userHandler.DeleteUser)
 	})
 
-	r.Post("/login", tenantAuthHandler.Login)
+	r.Post("/login", userAuthHandler.Login)
 
 	return r
 }

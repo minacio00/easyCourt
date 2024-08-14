@@ -13,7 +13,7 @@ import (
 
 // @title Easy Court API
 // @version 1.0
-// @description This is a sample server for Easy Court.
+// @description This is the api for easy court.
 // @host localhost:8080
 // @BasePath /
 func main() {
