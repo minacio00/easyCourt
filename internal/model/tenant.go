@@ -1,8 +1,6 @@
 package model
 
 import (
-	"time"
-
 	"gorm.io/gorm"
 )
 
@@ -12,5 +10,5 @@ type Tenant struct {
 	Email      string `json:"email" gorm:"unique; not nul"`
 	Password   string `json:"-"`
 	SchemaName string `json:"schema_name"`
-	FreeTrial  time.Time
+	FreeTrial  bool
 }
