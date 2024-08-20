@@ -1,9 +1,143 @@
-basePath: /
-host: localhost:8080
+basePath: /api/v1
+definitions:
+  github_com_minacio00_easyCourt_internal_model.APIError:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  github_com_minacio00_easyCourt_internal_model.User:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
 info:
   contact: {}
-  description: This is a sample server for Easy Court.
-  title: Easy Court API
+  description: This is a comprehensive API for the EasyCourt system.
+  title: EasyCourt API
   version: "1.0"
-paths: {}
+paths:
+  /users:
+    get:
+      description: Get a list of all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.User'
+            type: array
+      summary: Get all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the provided information
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+      summary: Create a new user
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update the details of a user
+      parameters:
+      - description: Updated user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.User'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+      summary: Update a user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      description: Delete a user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+      summary: Delete a user by ID
+      tags:
+      - users
+    get:
+      description: Get details of a user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.User'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+      summary: Get a user by ID
+      tags:
+      - users
 swagger: "2.0"

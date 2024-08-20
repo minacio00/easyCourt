@@ -1,3 +1,4 @@
+// Package handler manages all user-related operations.
 package handler
 
 import (
@@ -18,6 +19,16 @@ func NewUserHandler(service service.UserService) *UserHandler {
 	return &UserHandler{service}
 }
 
+// CreateUser creates a new user
+// @Summary Create a new user
+// @Description Create a new user with the provided information
+// @Tags users
+// @Accept  json
+// @Produce  json
+// @Param   user  body      model.User  true  "User data"
+// @Success 201  {object}  model.User
+// @Failure 400  {object}  model.APIError
+// @Router /users [post]
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user model.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
@@ -33,6 +44,15 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+// GetUserByID retrieves a user by ID
+// @Summary Get a user by ID
+// @Description Get details of a user by their ID
+// @Tags users
+// @Produce  json
+// @Param   id   path      int  true  "User ID"
+// @Success 200  {object}  model.User
+// @Failure 404  {object}  model.APIError
+// @Router /users/{id} [get]
 func (h *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -50,6 +70,13 @@ func (h *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
+// GetAllUsers retrieves all users
+// @Summary Get all users
+// @Description Get a list of all users
+// @Tags users
+// @Produce  json
+// @Success 200  {array}  model.User
+// @Router /users [get]
 func (h *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := h.service.GetAllUsers()
 	if err != nil {
@@ -60,6 +87,16 @@ func (h *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(users)
 }
 
+// UpdateUser updates a user
+// @Summary Update a user
+// @Description Update the details of a user
+// @Tags users
+// @Accept  json
+// @Produce  json
+// @Param   user  body      model.User  true  "Updated user data"
+// @Success 204
+// @Failure 400  {object}  model.APIError
+// @Router /users [put]
 func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	var user model.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
@@ -75,6 +112,14 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// DeleteUser deletes a user by ID
+// @Summary Delete a user by ID
+// @Description Delete a user by their ID
+// @Tags users
+// @Param   id   path      int  true  "User ID"
+// @Success 204
+// @Failure 404  {object}  model.APIError
+// @Router /users/{id} [delete]
 func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
