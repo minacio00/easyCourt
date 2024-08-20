@@ -16,11 +16,14 @@ jobs:
     - name: Set up SSH
       uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.SSH_KEY }}
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Clean up and Transfer files to Lightsail
+    - name: Ensure directory exists and clean up
       run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@eazycourt.com "rm -rf /home/ec2-user/easycourt/*"
+        ssh -o StrictHostKeyChecking=no ec2-user@eazycourt.com "mkdir -p /home/ec2-user/easycourt && rm -rf /home/ec2-user/easycourt/*"
+
+    - name: Transfer files to Lightsail
+      run: |
         scp -o StrictHostKeyChecking=no -r ./* ec2-user@eazycourt.com:/home/ec2-user/easycourt/
 
     - name: Deploy on Lightsail
