@@ -23,8 +23,18 @@ func NewRouter() http.Handler {
 	userHandler := handler.NewUserHandler(userService)
 	userAuthHandler := handler.NewUserAuthHandler(userService)
 
+	locationRepo := repository.NewLocationRepository(db.GetDB())
+	locationService := service.NewLocationService(locationRepo)
+	locationHandler := handler.NewLocationHandler(locationService)
+
 	// Define routes
 	r.Route("/api/v1", func(r chi.Router) {
+		r.Route("/location", func(r chi.Router) {
+			r.Post("/", locationHandler.CreateLocation)
+			r.Get("/", locationHandler.GetAllLocations)
+			r.Put("/", locationHandler.UpdateLocation)
+			r.Delete("/{id}", locationHandler.DeleteLocation)
+		})
 		// User routes
 		r.Route("/users", func(r chi.Router) {
 			r.Post("/", userHandler.CreateUser)
