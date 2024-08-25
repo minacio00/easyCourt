@@ -33,6 +33,13 @@ func (l *locationRepository) GetAllLocations() ([]model.Location, error) {
 }
 
 func (l *locationRepository) UpdateLocation(location *model.Location) error {
+	existingLocation := &model.Location{}
+	if err := l.db.First(existingLocation, location.ID).Error; err != nil {
+		return err // return error if location is not found
+	}
+	location.ID = existingLocation.ID
+
+	// Update the location with the new data
 	return l.db.Save(location).Error
 }
 

@@ -48,6 +48,15 @@ func (r *userRepository) GetAllUsers() ([]model.User, error) {
 }
 
 func (r *userRepository) UpdateUser(user *model.User) error {
+	existingUser := &model.User{}
+	if err := r.db.First(existingUser, user.ID).Error; err != nil {
+		return err // return error if user is not found
+	}
+
+	// Assign the found user's ID to the user object to ensure the correct record is updated
+	user.ID = existingUser.ID
+
+	// Update the user with the new data
 	return r.db.Save(user).Error
 }
 

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+
 	"github.com/minacio00/easyCourt/internal/model"
 	"github.com/minacio00/easyCourt/internal/repository"
 )
@@ -21,8 +23,11 @@ func NewLocationService(repo repository.LocationRepository) LocationService {
 }
 
 func (s *locationService) CreateLocation(location *model.Location) error {
-	// Add any additional logic before creating a location, if necessary
-	return s.repo.CreateLocation(location)
+	if location.Name != "" {
+		println(location.Name)
+		return s.repo.CreateLocation(location)
+	}
+	return errors.New("location_name cannot be empty")
 }
 
 func (s *locationService) GetAllLocations() ([]model.Location, error) {
@@ -30,11 +35,9 @@ func (s *locationService) GetAllLocations() ([]model.Location, error) {
 }
 
 func (s *locationService) UpdateLocation(location *model.Location) error {
-	// Add any additional logic before updating a location, if necessary
 	return s.repo.UpdateLocation(location)
 }
 
 func (s *locationService) DeleteLocation(id uint) error {
-	// Add any additional logic before deleting a location, if necessary
 	return s.repo.DeleteLocation(id)
 }
