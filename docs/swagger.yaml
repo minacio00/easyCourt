@@ -7,6 +7,13 @@ definitions:
       message:
         type: string
     type: object
+  github_com_minacio00_easyCourt_internal_model.Location:
+    properties:
+      id:
+        type: integer
+      location_name:
+        type: string
+    type: object
   github_com_minacio00_easyCourt_internal_model.User:
     properties:
       createdAt:
@@ -36,6 +43,88 @@ info:
   title: EasyCourt API
   version: "1.0"
 paths:
+  /locations:
+    get:
+      description: Get a list of all locations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Location'
+            type: array
+      summary: Get all locations
+      tags:
+      - location
+    post:
+      consumes:
+      - application/json
+      description: Create a new location with the provided information
+      parameters:
+      - description: Location data
+        in: body
+        name: location
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Location'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Location'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+      summary: Create a new location
+      tags:
+      - location
+    put:
+      consumes:
+      - application/json
+      description: Update the details of a location
+      parameters:
+      - description: Updated location data
+        in: body
+        name: location
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Location'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+      summary: Update a location
+      tags:
+      - location
+  /locations/{id}:
+    delete:
+      description: Delete a location by its ID
+      parameters:
+      - description: Location ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+      summary: Delete a location by ID
+      tags:
+      - location
   /users:
     get:
       description: Get a list of all users
