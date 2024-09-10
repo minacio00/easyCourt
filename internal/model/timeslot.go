@@ -22,8 +22,8 @@ type Timeslot struct {
 	CourtID   *int      `json:"court_id"`
 	Court     Court     `gorm:"foreignKey:CourtID"`
 	Day       Weekday   `json:"week_day" gorm:"type:week_days;not null"`
-	StartTime time.Time `json:"start_time"`
-	EndTime   time.Time `json:"end_time"`
+	StartTime time.Time `json:"start_time" gorm:"type:time"`
+	EndTime   time.Time `json:"end_time" gorm:"type:time"`
 	IsActive  bool      `gorm:"default:true"`
 }
 
