@@ -17,7 +17,7 @@ type Booking struct {
 
 type CreateBooking struct {
 	UserID          int     `json:"user_id"`
-	Opponent        string  `json:"oponnent_name"`
+	Opponent        string  `json:"opponent_name"`
 	Partner         *string `json:"partner_name"`
 	OpponentPartner *string `json:"opponent_partner"`
 	TimeslotID      int     `json:"timeslot_id"`

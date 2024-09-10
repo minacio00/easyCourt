@@ -26,6 +26,7 @@ func (s *timeslotService) CreateTimeslot(timeslot *model.Timeslot) error {
 	if err := timeslot.Validate(); err != nil {
 		return err
 	}
+	timeslot.Day = model.Domingo
 	return s.repo.CreateTimeslot(timeslot)
 }
 
@@ -34,7 +35,20 @@ func (s *timeslotService) GetTimeslotByID(id int) (*model.Timeslot, error) {
 }
 
 func (s *timeslotService) GetAllTimeslots() ([]model.Timeslot, error) {
-	return s.repo.GetAllTimeslots()
+	readSlots, err := s.repo.GetAllTimeslots()
+	if err != nil {
+		return nil, err
+	}
+
+	var timeslots []model.Timeslot
+	for _, rt := range readSlots {
+		ts, err := rt.ToTimeslot()
+		if err != nil {
+			return nil, err
+		}
+		timeslots = append(timeslots, *ts)
+	}
+	return timeslots, nil
 }
 
 func (s *timeslotService) UpdateTimeslot(timeslot *model.Timeslot) error {

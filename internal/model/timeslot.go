@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -18,7 +19,7 @@ const (
 )
 
 type Timeslot struct {
-	ID        int       `gorm:"primaryKey"`
+	ID        int       `gorm:"primaryKey" json:"id"`
 	CourtID   *int      `json:"court_id"`
 	Court     Court     `gorm:"foreignKey:CourtID"`
 	Day       Weekday   `json:"week_day" gorm:"type:week_days;not null"`
@@ -51,19 +52,71 @@ func (t *Timeslot) Validate() error {
 }
 
 type CreateTimeslot struct {
-	CourtID   int       `json:"court_id"`
-	Day       Weekday   `json:"week_day"`
-	StartTime time.Time `json:"start_time"`
-	EndTime   time.Time `json:"end_time"`
-	IsActive  bool      `json:"isActive"`
+	CourtID   *string `json:"court_id"`
+	Day       Weekday `json:"week_day"`
+	StartTime string  `json:"start_time"`
+	EndTime   string  `json:"end_time"`
+	IsActive  bool    `json:"isActive"`
 }
 
-func (c *CreateTimeslot) ConvertCreateTimeslotToTimeslot() *Timeslot {
-	return &Timeslot{
-		CourtID:   &c.CourtID,
-		Day:       c.Day,
-		StartTime: c.StartTime,
-		EndTime:   c.EndTime,
-		IsActive:  c.IsActive,
+func (c *CreateTimeslot) ConvertCreateTimeslotToTimeslot() (*Timeslot, error) {
+
+	startTime, err := time.Parse("15:04:05", c.StartTime)
+	if err != nil {
+		return nil, fmt.Errorf("invalid start_time format: %v", err)
 	}
+
+	endTime, err := time.Parse("15:04:05", c.EndTime)
+	if err != nil {
+		return nil, fmt.Errorf("invalid end_time format: %v", err)
+	}
+
+	var courtID *int
+	if c.CourtID != nil {
+		id, err := strconv.Atoi(*c.CourtID)
+		if err != nil {
+			return nil, fmt.Errorf("invalid court_id: %v", err)
+		}
+		courtID = &id
+	}
+
+	return &Timeslot{
+		CourtID:   courtID,
+		Day:       c.Day,
+		StartTime: startTime,
+		EndTime:   endTime,
+		IsActive:  c.IsActive,
+	}, nil
+}
+
+type ReadTimeslot struct {
+	ID        int     `json:"id"`
+	CourtID   *int    `json:"court_id"`
+	Court     Court   `json:"court"`
+	Day       Weekday `json:"week_day"`
+	StartTime string  `json:"start_time"`
+	EndTime   string  `json:"end_time"`
+	IsActive  bool    `json:"is_active"`
+}
+
+func (rt *ReadTimeslot) ToTimeslot() (*Timeslot, error) {
+	startTime, err := time.Parse("15:04:05", rt.StartTime)
+	if err != nil {
+		return nil, fmt.Errorf("invalid start_time format: %v", err)
+	}
+
+	endTime, err := time.Parse("15:04:05", rt.EndTime)
+	if err != nil {
+		return nil, fmt.Errorf("invalid end_time format: %v", err)
+	}
+
+	return &Timeslot{
+		ID:        rt.ID,
+		CourtID:   rt.CourtID,
+		Court:     rt.Court,
+		Day:       rt.Day,
+		StartTime: startTime,
+		EndTime:   endTime,
+		IsActive:  rt.IsActive,
+	}, nil
 }
