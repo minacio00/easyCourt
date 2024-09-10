@@ -1,0 +1,1 @@
+swag init --dir ./ --generalInfo cmd/main.go --output ./docs --parseInternal --parseDependency

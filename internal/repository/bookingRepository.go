@@ -8,7 +8,7 @@ import (
 type BookingRepository interface {
 	CreateBooking(booking *model.Booking) error
 	GetBookingByID(id int) (*model.Booking, error)
-	GetAllBookings() ([]model.Booking, error)
+	GetAllBookings(limit, offset int) ([]model.Booking, error)
 	UpdateBooking(booking *model.Booking) error
 	DeleteBooking(id int) error
 }
@@ -33,9 +33,13 @@ func (r *bookingRepository) GetBookingByID(id int) (*model.Booking, error) {
 	return &booking, nil
 }
 
-func (r *bookingRepository) GetAllBookings() ([]model.Booking, error) {
+func (r *bookingRepository) GetAllBookings(limit, offset int) ([]model.Booking, error) {
 	var bookings []model.Booking
-	if err := r.db.Preload("User").Preload("Timeslot").Find(&bookings).Error; err != nil {
+	if err := r.db.Preload("User").Preload("Timeslot").
+		Limit(limit).
+		Offset(offset).
+		Find(&bookings).
+		Error; err != nil {
 		return nil, err
 	}
 	return bookings, nil

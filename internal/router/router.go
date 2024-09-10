@@ -18,23 +18,33 @@ func NewRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
+	// Set up repositories
 	userRepo := repository.NewUserRepository(db.GetDB())
+	locationRepo := repository.NewLocationRepository(db.GetDB())
+	courtRepo := repository.NewCourtRepository(db.GetDB())
+	
+
+	// Set up services
 	userService := service.NewUserService(userRepo)
+	locationService := service.NewLocationService(locationRepo)
+	courtService := service.NewCourtService(courtRepo)
+
+	// Set up handlers
 	userHandler := handler.NewUserHandler(userService)
 	userAuthHandler := handler.NewUserAuthHandler(userService)
-
-	locationRepo := repository.NewLocationRepository(db.GetDB())
-	locationService := service.NewLocationService(locationRepo)
 	locationHandler := handler.NewLocationHandler(locationService)
+	courtHandler := handler.NewCourtHandler(courtService)
 
 	// Define routes
 	r.Route("/api/v1", func(r chi.Router) {
+		// Location routes
 		r.Route("/location", func(r chi.Router) {
 			r.Post("/", locationHandler.CreateLocation)
 			r.Get("/", locationHandler.GetAllLocations)
 			r.Put("/", locationHandler.UpdateLocation)
 			r.Delete("/{id}", locationHandler.DeleteLocation)
 		})
+
 		// User routes
 		r.Route("/users", func(r chi.Router) {
 			r.Post("/", userHandler.CreateUser)
@@ -44,11 +54,20 @@ func NewRouter() http.Handler {
 			r.Delete("/{id}", userHandler.DeleteUser)
 		})
 
+		// Court routes
+		r.Route("/courts", func(r chi.Router) {
+			r.Post("/", courtHandler.CreateCourt)
+			r.Get("/", courtHandler.GetAllCourts)
+			r.Get("/{id}", courtHandler.GetCourtByID)
+			r.Put("/", courtHandler.UpdateCourt)
+			r.Delete("/{id}", courtHandler.DeleteCourt)
+		})
+
 		// Authentication route
 		r.Post("/login", userAuthHandler.Login)
 	})
 
-	r.Post("/login", userAuthHandler.Login)
+	// Swagger documentation
 	r.Get("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL("/docs/swagger.json"), // Matches the expected URL
 	))

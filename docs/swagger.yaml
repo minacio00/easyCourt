@@ -7,6 +7,104 @@ definitions:
       message:
         type: string
     type: object
+  github_com_minacio00_easyCourt_internal_model.Booking:
+    properties:
+      booking_date:
+        description: Date of the booking
+        type: string
+      oponnent_name:
+        type: string
+      opponent_partner:
+        type: string
+      partner_name:
+        type: string
+      singles_flag:
+        type: boolean
+      timeslot_id:
+        description: Foreign key to Timeslot
+        type: integer
+      user:
+        allOf:
+        - $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.User'
+        description: Relationship with User
+      user_id:
+        description: Foreign key to User
+        type: integer
+    type: object
+  github_com_minacio00_easyCourt_internal_model.Court:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      location:
+        $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Location'
+      location_id:
+        type: integer
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  github_com_minacio00_easyCourt_internal_model.CreateBooking:
+    properties:
+      oponnent_name:
+        type: string
+      opponent_partner:
+        type: string
+      partner_name:
+        type: string
+      singles_flag:
+        type: boolean
+      timeslot_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  github_com_minacio00_easyCourt_internal_model.CreateLocation:
+    properties:
+      location_name:
+        type: string
+    type: object
+  github_com_minacio00_easyCourt_internal_model.CreateTimeslot:
+    properties:
+      court_id:
+        type: integer
+      end_time:
+        type: string
+      isActive:
+        type: boolean
+      start_time:
+        type: string
+      week_day:
+        $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Weekday'
+    type: object
+  github_com_minacio00_easyCourt_internal_model.Location:
+    properties:
+      id:
+        type: integer
+      location_name:
+        type: string
+    type: object
+  github_com_minacio00_easyCourt_internal_model.Timeslot:
+    properties:
+      court:
+        $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Court'
+      court_id:
+        type: integer
+      end_time:
+        type: string
+      id:
+        type: integer
+      isActive:
+        type: boolean
+      start_time:
+        type: string
+      week_day:
+        $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Weekday'
+    type: object
   github_com_minacio00_easyCourt_internal_model.User:
     properties:
       createdAt:
@@ -22,6 +120,24 @@ definitions:
       updatedAt:
         type: string
     type: object
+  github_com_minacio00_easyCourt_internal_model.Weekday:
+    enum:
+    - Domingo
+    - Segunda-feira
+    - Terça-feira
+    - Quarta-feira
+    - Quinta-feira
+    - Sexta-feira
+    - Sábado
+    type: string
+    x-enum-varnames:
+    - Domingo
+    - SegundaFeira
+    - TercaFeira
+    - QuartaFeira
+    - QuintaFeira
+    - SextaFeira
+    - Sabado
   gorm.DeletedAt:
     properties:
       time:
@@ -36,6 +152,568 @@ info:
   title: EasyCourt API
   version: "1.0"
 paths:
+  /bookings:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all bookings with pagination support
+      parameters:
+      - default: 10
+        description: Number of bookings to retrieve
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset of bookings
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Booking'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get all bookings
+      tags:
+      - bookings
+    post:
+      consumes:
+      - application/json
+      description: Creates a new booking based on the provided payload
+      parameters:
+      - description: Booking Data
+        in: body
+        name: booking
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.CreateBooking'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Booking'
+        "400":
+          description: Invalid request payload
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create a new booking
+      tags:
+      - bookings
+  /bookings/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a booking by its ID
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "404":
+          description: Booking not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete a booking
+      tags:
+      - bookings
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific booking by its ID
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Booking'
+        "404":
+          description: Booking not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get booking by ID
+      tags:
+      - bookings
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing booking based on the provided payload
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Booking Data
+        in: body
+        name: booking
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Booking'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Booking'
+        "400":
+          description: Invalid request payload
+          schema:
+            type: string
+        "404":
+          description: Booking not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update a booking
+      tags:
+      - bookings
+  /courts:
+    get:
+      description: Retrieves all courts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Court'
+            type: array
+        "500":
+          description: Failed to fetch courts
+          schema:
+            type: string
+      summary: Get all courts
+      tags:
+      - court
+    post:
+      consumes:
+      - application/json
+      description: Creates a new court with the provided data
+      parameters:
+      - description: Court data
+        in: body
+        name: court
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Court'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Invalid request payload
+          schema:
+            type: string
+        "500":
+          description: Failed to create court
+          schema:
+            type: string
+      summary: Create a new court
+      tags:
+      - court
+    put:
+      consumes:
+      - application/json
+      description: Updates the data of an existing court
+      parameters:
+      - description: Court data
+        in: body
+        name: court
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Court'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Invalid request payload
+          schema:
+            type: string
+        "500":
+          description: Failed to update court
+          schema:
+            type: string
+      summary: Update an existing court
+      tags:
+      - court
+  /courts/{id}:
+    delete:
+      description: Deletes a court based on the given ID
+      parameters:
+      - description: Court ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Invalid court ID
+          schema:
+            type: string
+        "500":
+          description: Failed to delete court
+          schema:
+            type: string
+      summary: Delete a court by ID
+      tags:
+      - court
+    get:
+      description: Retrieves a court by its ID
+      parameters:
+      - description: Court ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Court'
+        "400":
+          description: Invalid court ID
+          schema:
+            type: string
+        "404":
+          description: Court not found
+          schema:
+            type: string
+      summary: Get court by ID
+      tags:
+      - court
+  /courts/location/{location_name}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the court information based on the provided location
+        name.
+      parameters:
+      - description: Name of the location
+        in: path
+        name: location_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Court information
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Court'
+        "400":
+          description: Error message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a court by location name
+      tags:
+      - court
+  /location:
+    get:
+      description: Get a list of all locations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Location'
+            type: array
+        "204":
+          description: No Content
+          schema:
+            type: string
+      summary: Get all locations
+      tags:
+      - location
+    post:
+      consumes:
+      - application/json
+      description: Create a new location with the provided information
+      parameters:
+      - description: Location data
+        in: body
+        name: location
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.CreateLocation'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Location'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+      summary: Create a new location
+      tags:
+      - location
+    put:
+      consumes:
+      - application/json
+      description: Update the details of a location
+      parameters:
+      - description: Updated location data
+        in: body
+        name: location
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Location'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+      summary: Update a location
+      tags:
+      - location
+  /location/{id}:
+    delete:
+      description: Delete a location by its ID
+      parameters:
+      - description: Location ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+      summary: Delete a location by ID
+      tags:
+      - location
+  /timeslots:
+    get:
+      description: Retrieves all timeslots
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of timeslots
+          schema:
+            items:
+              $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all timeslots
+      tags:
+      - Timeslots
+    post:
+      consumes:
+      - application/json
+      description: Creates a new timeslot in the system
+      parameters:
+      - description: Timeslot data
+        in: body
+        name: timeslot
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.CreateTimeslot'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Timeslot created successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid input data
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new timeslot
+      tags:
+      - Timeslots
+  /timeslots/{id}:
+    delete:
+      description: Deletes a timeslot by its ID
+      parameters:
+      - description: Timeslot ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: Timeslot deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid ID supplied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a timeslot
+      tags:
+      - Timeslots
+    get:
+      description: Retrieves a single timeslot by its ID
+      parameters:
+      - description: Timeslot ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Timeslot data
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot'
+        "400":
+          description: Invalid ID supplied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Timeslot not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get timeslot by ID
+      tags:
+      - Timeslots
+    put:
+      consumes:
+      - application/json
+      description: Updates the details of an existing timeslot
+      parameters:
+      - description: Timeslot ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated timeslot data
+        in: body
+        name: timeslot
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Timeslot updated successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid input or ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a timeslot
+      tags:
+      - Timeslots
+  /timeslots/active:
+    get:
+      description: Retrieves all active timeslots
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of active timeslots
+          schema:
+            items:
+              $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get active timeslots
+      tags:
+      - Timeslots
   /users:
     get:
       description: Get a list of all users
