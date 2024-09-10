@@ -20,10 +20,25 @@ func NewCourtHandler(s service.CourtService) *CourtHandler {
 }
 
 // CreateCourt handles the creation of a new court
+// @Summary Create a new court
+// @Description Creates a new court with the provided data
+// @Tags court
+// @Accept  json
+// @Produce  json
+// @Param   court  body  model.Court  true  "Court data"
+// @Success 201
+// @Failure 400  {string}  string  "Invalid request payload"
+// @Failure 500  {string}  string  "Failed to create court"
+// @Router /courts [post]
 func (h *CourtHandler) CreateCourt(w http.ResponseWriter, r *http.Request) {
 	var court model.Court
 	if err := json.NewDecoder(r.Body).Decode(&court); err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+	if err := court.Validate(); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
@@ -36,10 +51,22 @@ func (h *CourtHandler) CreateCourt(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetAllCourts handles fetching all courts
+// @Summary Get all courts
+// @Description Retrieves all courts
+// @Tags court
+// @Produce  json
+// @Success 200  {array}  model.Court
+// @Failure 500  {string}  string  "Failed to fetch courts"
+// @Router /courts [get]
 func (h *CourtHandler) GetAllCourts(w http.ResponseWriter, r *http.Request) {
 	courts, err := h.service.GetAllCourts()
 	if err != nil {
 		http.Error(w, "Failed to fetch courts", http.StatusInternalServerError)
+		return
+	}
+	if len(courts) == 0 {
+		w.WriteHeader(http.StatusNoContent)
+		json.NewEncoder(w).Encode(courts)
 		return
 	}
 
@@ -48,6 +75,15 @@ func (h *CourtHandler) GetAllCourts(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetCourtByID handles fetching a court by its ID
+// @Summary Get court by ID
+// @Description Retrieves a court by its ID
+// @Tags court
+// @Produce  json
+// @Param   id  path  int  true  "Court ID"
+// @Success 200  {object}  model.Court
+// @Failure 400  {string}  string  "Invalid court ID"
+// @Failure 404  {string}  string  "Court not found"
+// @Router /courts/{id} [get]
 func (h *CourtHandler) GetCourtByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -66,7 +102,43 @@ func (h *CourtHandler) GetCourtByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(court)
 }
 
+// @Summary Get a court by location name
+// @Description Retrieves the court information based on the provided location name.
+// @Tags court
+// @Accept json
+// @Produce json
+// @Param location_name path string true "Name of the location"
+// @Success 202 {object} model.Court "Court information"
+// @Failure 400 {object} map[string]string "Error message"
+// @Router /courts/location/{location_name} [get]
+func (h *CourtHandler) GetCourtByLocation(w http.ResponseWriter, r *http.Request) {
+	location_name := chi.URLParam(r, "location_name")
+	if location_name == "" {
+		http.Error(w, "missing location_name param", http.StatusBadRequest)
+		return
+	}
+	court, err := h.service.GetCourtByLocation(location_name)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+	w.WriteHeader(http.StatusAccepted)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(court)
+
+}
+
 // UpdateCourt handles updating an existing court
+// @Summary Update an existing court
+// @Description Updates the data of an existing court
+// @Tags court
+// @Accept  json
+// @Param   court  body  model.Court  true  "Court data"
+// @Success 200
+// @Failure 400  {string}  string  "Invalid request payload"
+// @Failure 500  {string}  string  "Failed to update court"
+// @Router /courts [put]
 func (h *CourtHandler) UpdateCourt(w http.ResponseWriter, r *http.Request) {
 	var court model.Court
 	if err := json.NewDecoder(r.Body).Decode(&court); err != nil {
@@ -83,6 +155,14 @@ func (h *CourtHandler) UpdateCourt(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteCourt handles deleting a court by its ID
+// @Summary Delete a court by ID
+// @Description Deletes a court based on the given ID
+// @Tags court
+// @Param   id  path  int  true  "Court ID"
+// @Success 204
+// @Failure 400  {string}  string  "Invalid court ID"
+// @Failure 500  {string}  string  "Failed to delete court"
+// @Router /courts/{id} [delete]
 func (h *CourtHandler) DeleteCourt(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)

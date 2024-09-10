@@ -25,10 +25,10 @@ func NewLocationHandler(s service.LocationService) *LocationHandler {
 // @Tags location
 // @Accept  json
 // @Produce  json
-// @Param   location  body      model.Location  true  "Location data"
+// @Param   location  body      model.CreateLocation  true  "Location data"
 // @Success 201  {object}  model.Location
 // @Failure 400  {object}  model.APIError
-// @Router /locations [post]
+// @Router /location [post]
 func (h *LocationHandler) CreateLocation(w http.ResponseWriter, r *http.Request) {
 	var location model.Location
 	if err := json.NewDecoder(r.Body).Decode(&location); err != nil {
@@ -52,11 +52,12 @@ func (h *LocationHandler) CreateLocation(w http.ResponseWriter, r *http.Request)
 // @Tags location
 // @Produce  json
 // @Success 200  {array}  model.Location
-// @Router /locations [get]
+// @Success 204 {string} string "No Content"
+// @Router /location [get]
 func (h *LocationHandler) GetAllLocations(w http.ResponseWriter, r *http.Request) {
 	locations, err := h.service.GetAllLocations()
 	if err != nil {
-		w.WriteHeader(http.StatusBadGateway)
+		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
@@ -78,7 +79,7 @@ func (h *LocationHandler) GetAllLocations(w http.ResponseWriter, r *http.Request
 // @Param   location  body      model.Location  true  "Updated location data"
 // @Success 204
 // @Failure 400  {object}  model.APIError
-// @Router /locations [put]
+// @Router /location [put]
 func (h *LocationHandler) UpdateLocation(w http.ResponseWriter, r *http.Request) {
 	var location model.Location
 	if err := json.NewDecoder(r.Body).Decode(&location); err != nil {
@@ -106,7 +107,7 @@ func (h *LocationHandler) UpdateLocation(w http.ResponseWriter, r *http.Request)
 // @Param   id   path      int  true  "Location ID"
 // @Success 204
 // @Failure 400  {object}  model.APIError
-// @Router /locations/{id} [delete]
+// @Router /location/{id} [delete]
 func (h *LocationHandler) DeleteLocation(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)

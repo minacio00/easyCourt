@@ -23,7 +23,9 @@ func NewTimeslotService(repo repository.TimeslotRepository) TimeslotService {
 }
 
 func (s *timeslotService) CreateTimeslot(timeslot *model.Timeslot) error {
-	// Add any additional logic before creating a timeslot, if necessary
+	if err := timeslot.Validate(); err != nil {
+		return err
+	}
 	return s.repo.CreateTimeslot(timeslot)
 }
 

@@ -13,3 +13,14 @@ func (l *Location) Validate() error {
 	}
 	return nil
 }
+
+type CreateLocation struct {
+	Name string `json:"location_name"`
+}
+
+func (l *CreateLocation) Validate() error {
+	if l.Name == "" {
+		return errors.New("location name is required")
+	}
+	return nil
+}

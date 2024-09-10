@@ -9,6 +9,7 @@ type CourtService interface {
 	CreateCourt(court *model.Court) error
 	GetAllCourts() ([]model.Court, error)
 	GetCourtByID(id int) (*model.Court, error)
+	GetCourtByLocation(location_name string) (*model.Court, error)
 	UpdateCourt(court *model.Court) error
 	DeleteCourt(id int) error
 }
@@ -35,6 +36,10 @@ func (s *courtService) GetAllCourts() ([]model.Court, error) {
 // GetCourtByID retrieves a court by its ID by calling the repository
 func (s *courtService) GetCourtByID(id int) (*model.Court, error) {
 	return s.repo.GetCourtByID(id)
+}
+
+func (s *courtService) GetCourtByLocation(location_name string) (*model.Court, error) {
+	return s.repo.GetCourtByLocation(location_name)
 }
 
 // UpdateCourt updates an existing court by calling the repository

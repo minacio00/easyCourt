@@ -22,6 +22,7 @@ func NewRouter() http.Handler {
 	userRepo := repository.NewUserRepository(db.GetDB())
 	locationRepo := repository.NewLocationRepository(db.GetDB())
 	courtRepo := repository.NewCourtRepository(db.GetDB())
+	
 
 	// Set up services
 	userService := service.NewUserService(userRepo)

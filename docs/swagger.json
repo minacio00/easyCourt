@@ -8,7 +8,465 @@
     },
     "basePath": "/api/v1",
     "paths": {
-        "/locations": {
+        "/bookings": {
+            "get": {
+                "description": "Retrieves all bookings with pagination support",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "Get all bookings",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of bookings to retrieve",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset of bookings",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Booking"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new booking based on the provided payload",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "Create a new booking",
+                "parameters": [
+                    {
+                        "description": "Booking Data",
+                        "name": "booking",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.CreateBooking"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Booking"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request payload",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/bookings/{id}": {
+            "get": {
+                "description": "Retrieves a specific booking by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "Get booking by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Booking ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Booking"
+                        }
+                    },
+                    "404": {
+                        "description": "Booking not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates an existing booking based on the provided payload",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "Update a booking",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Booking ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Booking Data",
+                        "name": "booking",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Booking"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Booking"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request payload",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Booking not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a booking by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "Delete a booking",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Booking ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Booking not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/courts": {
+            "get": {
+                "description": "Retrieves all courts",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "court"
+                ],
+                "summary": "Get all courts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Court"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to fetch courts",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates the data of an existing court",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "court"
+                ],
+                "summary": "Update an existing court",
+                "parameters": [
+                    {
+                        "description": "Court data",
+                        "name": "court",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Court"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Invalid request payload",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to update court",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new court with the provided data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "court"
+                ],
+                "summary": "Create a new court",
+                "parameters": [
+                    {
+                        "description": "Court data",
+                        "name": "court",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Court"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Invalid request payload",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create court",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/courts/location/{location_name}": {
+            "get": {
+                "description": "Retrieves the court information based on the provided location name.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "court"
+                ],
+                "summary": "Get a court by location name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Name of the location",
+                        "name": "location_name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Court information",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Court"
+                        }
+                    },
+                    "400": {
+                        "description": "Error message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/courts/{id}": {
+            "get": {
+                "description": "Retrieves a court by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "court"
+                ],
+                "summary": "Get court by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Court ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Court"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid court ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Court not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a court based on the given ID",
+                "tags": [
+                    "court"
+                ],
+                "summary": "Delete a court by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Court ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Invalid court ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to delete court",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/location": {
             "get": {
                 "description": "Get a list of all locations",
                 "produces": [
@@ -26,6 +484,12 @@
                             "items": {
                                 "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Location"
                             }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -84,7 +548,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Location"
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.CreateLocation"
                         }
                     }
                 ],
@@ -104,7 +568,7 @@
                 }
             }
         },
-        "/locations/{id}": {
+        "/location/{id}": {
             "delete": {
                 "description": "Delete a location by its ID",
                 "tags": [
@@ -128,6 +592,266 @@
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/timeslots": {
+            "get": {
+                "description": "Retrieves all timeslots",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Timeslots"
+                ],
+                "summary": "Get all timeslots",
+                "responses": {
+                    "200": {
+                        "description": "List of timeslots",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new timeslot in the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Timeslots"
+                ],
+                "summary": "Create a new timeslot",
+                "parameters": [
+                    {
+                        "description": "Timeslot data",
+                        "name": "timeslot",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.CreateTimeslot"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Timeslot created successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/timeslots/active": {
+            "get": {
+                "description": "Retrieves all active timeslots",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Timeslots"
+                ],
+                "summary": "Get active timeslots",
+                "responses": {
+                    "200": {
+                        "description": "List of active timeslots",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/timeslots/{id}": {
+            "get": {
+                "description": "Retrieves a single timeslot by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Timeslots"
+                ],
+                "summary": "Get timeslot by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Timeslot ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Timeslot data",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID supplied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Timeslot not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates the details of an existing timeslot",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Timeslots"
+                ],
+                "summary": "Update a timeslot",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Timeslot ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated timeslot data",
+                        "name": "timeslot",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Timeslot updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a timeslot by its ID",
+                "tags": [
+                    "Timeslots"
+                ],
+                "summary": "Delete a timeslot",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Timeslot ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Timeslot deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID supplied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -304,6 +1028,120 @@
                 }
             }
         },
+        "github_com_minacio00_easyCourt_internal_model.Booking": {
+            "type": "object",
+            "properties": {
+                "booking_date": {
+                    "description": "Date of the booking",
+                    "type": "string"
+                },
+                "oponnent_name": {
+                    "type": "string"
+                },
+                "opponent_partner": {
+                    "type": "string"
+                },
+                "partner_name": {
+                    "type": "string"
+                },
+                "singles_flag": {
+                    "type": "boolean"
+                },
+                "timeslot_id": {
+                    "description": "Foreign key to Timeslot",
+                    "type": "integer"
+                },
+                "user": {
+                    "description": "Relationship with User",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.User"
+                        }
+                    ]
+                },
+                "user_id": {
+                    "description": "Foreign key to User",
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_minacio00_easyCourt_internal_model.Court": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "location": {
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Location"
+                },
+                "location_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_minacio00_easyCourt_internal_model.CreateBooking": {
+            "type": "object",
+            "properties": {
+                "oponnent_name": {
+                    "type": "string"
+                },
+                "opponent_partner": {
+                    "type": "string"
+                },
+                "partner_name": {
+                    "type": "string"
+                },
+                "singles_flag": {
+                    "type": "boolean"
+                },
+                "timeslot_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_minacio00_easyCourt_internal_model.CreateLocation": {
+            "type": "object",
+            "properties": {
+                "location_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_minacio00_easyCourt_internal_model.CreateTimeslot": {
+            "type": "object",
+            "properties": {
+                "court_id": {
+                    "type": "integer"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "week_day": {
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Weekday"
+                }
+            }
+        },
         "github_com_minacio00_easyCourt_internal_model.Location": {
             "type": "object",
             "properties": {
@@ -312,6 +1150,32 @@
                 },
                 "location_name": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_minacio00_easyCourt_internal_model.Timeslot": {
+            "type": "object",
+            "properties": {
+                "court": {
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Court"
+                },
+                "court_id": {
+                    "type": "integer"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "week_day": {
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Weekday"
                 }
             }
         },
@@ -337,6 +1201,27 @@
                     "type": "string"
                 }
             }
+        },
+        "github_com_minacio00_easyCourt_internal_model.Weekday": {
+            "type": "string",
+            "enum": [
+                "Domingo",
+                "Segunda-feira",
+                "Terça-feira",
+                "Quarta-feira",
+                "Quinta-feira",
+                "Sexta-feira",
+                "Sábado"
+            ],
+            "x-enum-varnames": [
+                "Domingo",
+                "SegundaFeira",
+                "TercaFeira",
+                "QuartaFeira",
+                "QuintaFeira",
+                "SextaFeira",
+                "Sabado"
+            ]
         },
         "gorm.DeletedAt": {
             "type": "object",
