@@ -1,7 +1,10 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/minacio00/easyCourt/internal/model"
+	"github.com/minacio00/easyCourt/internal/model/utils"
 	"github.com/minacio00/easyCourt/internal/repository"
 )
 
@@ -26,7 +29,13 @@ func (s *timeslotService) CreateTimeslot(timeslot *model.Timeslot) error {
 	if err := timeslot.Validate(); err != nil {
 		return err
 	}
-	timeslot.Day = model.Domingo
+	var err error = nil
+	timeslot.Day, err = utils.MapWeekDay(string(timeslot.Day))
+	if err != nil {
+		return err
+	}
+	fmt.Println(timeslot.Day)
+
 	return s.repo.CreateTimeslot(timeslot)
 }
 

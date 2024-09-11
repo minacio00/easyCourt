@@ -78,6 +78,8 @@ func (c *CreateTimeslot) ConvertCreateTimeslotToTimeslot() (*Timeslot, error) {
 			return nil, fmt.Errorf("invalid court_id: %v", err)
 		}
 		courtID = &id
+	} else {
+		return nil, fmt.Errorf("court_id is required: %v", err)
 	}
 
 	return &Timeslot{
