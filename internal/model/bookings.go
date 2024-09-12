@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type Booking struct {
 	ID              int       `gorm:"primaryKey" json:"-"`
@@ -15,9 +18,33 @@ type Booking struct {
 	IsSinglesGame   bool      `json:"singles_flag"`
 }
 
+func (bk *Booking) Validate() error {
+	var errors []string
+	if bk.UserID == 0 {
+		errors = append(errors, "user_id is required")
+	}
+	if bk.Opponent == "" {
+		errors = append(errors, "oponnent is required")
+	}
+	if bk.Partner == nil && !bk.IsSinglesGame {
+		errors = append(errors, "partner_name is required for doubles games")
+	}
+	if bk.OpponentPartner == nil && !bk.IsSinglesGame {
+		errors = append(errors, "opponent_partner is required for doubles games")
+	}
+	if bk.TimeslotID == 0 {
+		errors = append(errors, "timeslot_id is required")
+	}
+
+	if len(errors) > 0 {
+		return fmt.Errorf("validation errors: %v", errors)
+	}
+	return nil
+}
+
 type CreateBooking struct {
 	UserID          int     `json:"user_id"`
-	Opponent        string  `json:"oponnent_name"`
+	Opponent        string  `json:"opponent_name"`
 	Partner         *string `json:"partner_name"`
 	OpponentPartner *string `json:"opponent_partner"`
 	TimeslotID      int     `json:"timeslot_id"`

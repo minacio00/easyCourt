@@ -37,7 +37,8 @@ func (h *BookingHandler) CreateBooking(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.service.CreateBooking(createBooking.ConvertToBooking()); err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 	w.WriteHeader(http.StatusCreated)

@@ -37,7 +37,7 @@ func Init() {
 		}
 		if err := DB.AutoMigrate(
 			&model.User{},
-			&model.Day{}, &model.Location{},
+			&model.Location{},
 			&model.Court{}, &model.Timeslot{}, &model.Booking{},
 		); err != nil {
 			log.Fatalf("AutoMigrate failed: %v", err)

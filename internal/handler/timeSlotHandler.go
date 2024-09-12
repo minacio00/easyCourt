@@ -36,7 +36,13 @@ func (h *timeSlotHandler) CreateTimeslot(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if err := h.service.CreateTimeslot(timeSlot.ConvertCreateTimeslotToTimeslot()); err != nil {
+	ts, err := timeSlot.ConvertCreateTimeslotToTimeslot()
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+	if err := h.service.CreateTimeslot(ts); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
