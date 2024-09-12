@@ -2,7 +2,6 @@ package service
 
 import (
 	"sync"
-	"time"
 
 	"github.com/minacio00/easyCourt/internal/model"
 	"github.com/minacio00/easyCourt/internal/repository"
@@ -34,10 +33,13 @@ func NewBookingService(repo repository.BookingRepository) BookingService {
 }
 
 func (s *bookingService) CreateBooking(booking *model.Booking) error {
-	mutex := getTimeslotMutex(booking.TimeslotID)
-	mutex.Lock()
-	defer mutex.Unlock()
-	time.Sleep(2 * time.Second)
+	if err := booking.Validate(); err != nil {
+		return err
+	}
+	// mutex := getTimeslotMutex(booking.TimeslotID)
+	// mutex.Lock()
+	// defer mutex.Unlock()
+	// time.Sleep(2 * time.Second)
 	if err := s.repo.CheckTimeslotAvailability(booking); err != nil {
 		return err
 	}

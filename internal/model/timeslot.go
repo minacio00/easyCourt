@@ -94,7 +94,7 @@ func (c *CreateTimeslot) ConvertCreateTimeslotToTimeslot() (*Timeslot, error) {
 type ReadTimeslot struct {
 	ID        int     `json:"id"`
 	CourtID   *int    `json:"court_id"`
-	Court     Court   `json:"court"`
+	Court     Court   `json:"-"`
 	Day       Weekday `json:"week_day"`
 	StartTime string  `json:"start_time"`
 	EndTime   string  `json:"end_time"`

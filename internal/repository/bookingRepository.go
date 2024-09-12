@@ -29,12 +29,29 @@ func (r *bookingRepository) CreateBooking(booking *model.Booking) error {
 }
 
 func (r *bookingRepository) CheckTimeslotAvailability(booking *model.Booking) error {
-	var book model.Booking
-	result := r.db.Preload("timeslot").Where("timeslot_id = ?", booking.TimeslotID).First(&book)
-	if result.RowsAffected > 0 {
-		return fmt.Errorf("horário não disponível para a quadra %d", *booking.Timeslot.CourtID)
+	// var book model.CreateBooking
+	// result := r.db.Preload("Timeslot").Where("timeslot_id = ?", booking.TimeslotID).First(&book)
+	// if result.RowsAffected > 0 {
+	// 	return fmt.Errorf("horário não disponível para a quadra %d", &booking.TimeslotID)
+	// }
+	query := `
+		SELECT b.id, b.timeslot_id, t.start_time, t.end_time
+		from bookings b
+		JOIN timeslots t ON b.timeslot_id = t.id
+		WHERE b.timeslot_id = ?
+		LIMIT 1
+	`
+	var result map[string]interface{}
+	err := r.db.Raw(query, booking.TimeslotID).Scan(&result).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// Timeslot is available
+			return nil
+		}
+		// Other database error occurred
+		return fmt.Errorf("error checking timeslot availability: %w", err)
 	}
-	return nil
+	return fmt.Errorf("horário não disponível para a quadra %d", booking.TimeslotID)
 }
 
 func (r *bookingRepository) GetBookingByID(id int) (*model.Booking, error) {
