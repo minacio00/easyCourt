@@ -36,13 +36,16 @@ func (s *bookingService) CreateBooking(booking *model.Booking) error {
 	if err := booking.Validate(); err != nil {
 		return err
 	}
-	// mutex := getTimeslotMutex(booking.TimeslotID)
-	// mutex.Lock()
-	// defer mutex.Unlock()
-	// time.Sleep(2 * time.Second)
 	if err := s.repo.CheckTimeslotAvailability(booking); err != nil {
 		return err
 	}
+
+	mutex := getTimeslotMutex(booking.TimeslotID)
+	if !mutex.TryLock() {
+		mutex.Lock()
+	}
+	defer mutex.Unlock()
+
 	return s.repo.CreateBooking(booking)
 }
 
