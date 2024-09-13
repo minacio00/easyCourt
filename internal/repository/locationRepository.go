@@ -9,6 +9,7 @@ type LocationRepository interface {
 	CreateLocation(location *model.Location) error
 	GetAllLocations() ([]model.Location, error)
 	UpdateLocation(location *model.Location) error
+	GetAllLocationCourts(location_id uint) ([]model.Court, error)
 	DeleteLocation(id uint) error
 }
 
@@ -30,6 +31,14 @@ func (l *locationRepository) GetAllLocations() ([]model.Location, error) {
 		return nil, err
 	}
 	return location, nil
+}
+
+func (l *locationRepository) GetAllLocationCourts(location_id uint) ([]model.Court, error) {
+	var courts []model.Court
+	if err := l.db.Where("location_id = ?", location_id).Find(&courts).Error; err != nil {
+		return nil, err
+	}
+	return courts, nil
 }
 
 func (l *locationRepository) UpdateLocation(location *model.Location) error {
