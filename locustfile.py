@@ -15,10 +15,10 @@ class BookingUser(HttpUser):
         }
         headers = {"Content-Type": "application/json"}
 
-        with self.client.post(
-            "/bookings", json=payload, headers=headers, catch_response=True
+        with self.client.get(
+            "/courts", json=payload, headers=headers, catch_response=True
         ) as response:
-            if response.status_code == 201:
+            if response.status_code == 200:
                 response.success()
             else:
                 response.failure(f"Failed to create booking: {response.text}")
