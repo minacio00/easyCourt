@@ -3,8 +3,9 @@ package model
 import "errors"
 
 type Location struct {
-	ID   int    `gorm:"primaryKey"`
-	Name string `json:"location_name" gorm:"unique;not null"`
+	ID       int    `gorm:"primaryKey"`
+	Name     string `json:"location_name" gorm:"unique;not null"`
+	ImageUrl string `json:"image_url"`
 }
 
 func (l *Location) Validate() error {

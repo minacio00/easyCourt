@@ -50,7 +50,7 @@ definitions:
     type: object
   github_com_minacio00_easyCourt_internal_model.CreateBooking:
     properties:
-      oponnent_name:
+      opponent_name:
         type: string
       opponent_partner:
         type: string
@@ -71,7 +71,7 @@ definitions:
   github_com_minacio00_easyCourt_internal_model.CreateTimeslot:
     properties:
       court_id:
-        type: integer
+        type: string
       end_time:
         type: string
       isActive:
@@ -85,6 +85,8 @@ definitions:
     properties:
       id:
         type: integer
+      image_url:
+        type: string
       location_name:
         type: string
     type: object
@@ -428,12 +430,11 @@ paths:
       summary: Get court by ID
       tags:
       - court
-  /courts/location/{location_name}:
+  /courts/location/{location_id}:
     get:
       consumes:
       - application/json
-      description: Retrieves the court information based on the provided location
-        name.
+      description: Retrieves all the courts from a location.
       parameters:
       - description: Name of the location
         in: path
@@ -446,14 +447,16 @@ paths:
         "202":
           description: Court information
           schema:
-            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Court'
+            items:
+              $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Court'
+            type: array
         "400":
           description: Error message
           schema:
             additionalProperties:
               type: string
             type: object
-      summary: Get a court by location name
+      summary: Get the courts by location id
       tags:
       - court
   /location:

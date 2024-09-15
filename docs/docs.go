@@ -358,9 +358,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/courts/location/{location_name}": {
+        "/courts/location/{location_id}": {
             "get": {
-                "description": "Retrieves the court information based on the provided location name.",
+                "description": "Retrieves all the courts from a location.",
                 "consumes": [
                     "application/json"
                 ],
@@ -370,7 +370,7 @@ const docTemplate = `{
                 "tags": [
                     "court"
                 ],
-                "summary": "Get a court by location name",
+                "summary": "Get the courts by location id",
                 "parameters": [
                     {
                         "type": "string",
@@ -384,7 +384,10 @@ const docTemplate = `{
                     "202": {
                         "description": "Court information",
                         "schema": {
-                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Court"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Court"
+                            }
                         }
                     },
                     "400": {
@@ -1101,7 +1104,7 @@ const docTemplate = `{
         "github_com_minacio00_easyCourt_internal_model.CreateBooking": {
             "type": "object",
             "properties": {
-                "oponnent_name": {
+                "opponent_name": {
                     "type": "string"
                 },
                 "opponent_partner": {
@@ -1133,7 +1136,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "court_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "end_time": {
                     "type": "string"
@@ -1154,6 +1157,9 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "image_url": {
+                    "type": "string"
                 },
                 "location_name": {
                     "type": "string"
