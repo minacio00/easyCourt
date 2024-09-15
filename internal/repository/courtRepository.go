@@ -9,7 +9,7 @@ type CourtRepository interface {
 	CreateCourt(court *model.Court) error
 	GetAllCourts() ([]model.Court, error)
 	GetCourtByID(id int) (*model.Court, error)
-	GetCourtByLocation(location_name string) (*model.Court, error)
+	GetCourtByLocation(location_id int) (*[]model.Court, error)
 	UpdateCourt(court *model.Court) error
 	DeleteCourt(id int) error
 }
@@ -44,10 +44,10 @@ func (r *courtRepository) GetCourtByID(id int) (*model.Court, error) {
 	}
 	return &court, nil
 }
-func (r *courtRepository) GetCourtByLocation(location_name string) (*model.Court, error) {
-	var court model.Court
-	err := r.db.Joins("locations").Where("locations.name = ?", location_name).First(&court).Error
-	return &court, err
+func (r *courtRepository) GetCourtByLocation(location_id int) (*[]model.Court, error) {
+	var courts []model.Court
+	err := r.db.Joins("locations").Where("locations.id = ?", location_id).First(&courts).Error
+	return &courts, err
 }
 
 // UpdateCourt updates an existing court in the database

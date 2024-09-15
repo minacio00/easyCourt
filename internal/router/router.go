@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	_ "github.com/minacio00/easyCourt/docs"
 	"github.com/minacio00/easyCourt/internal/db"
 	"github.com/minacio00/easyCourt/internal/handler"
@@ -16,6 +17,12 @@ import (
 
 func NewRouter() http.Handler {
 	r := chi.NewRouter()
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{"http://*", "http://*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders: []string{"Link"},
+	}))
 	r.Use(middleware.Logger)
 
 	// Set up repositories
