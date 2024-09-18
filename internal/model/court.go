@@ -8,9 +8,9 @@ import (
 
 type Court struct {
 	gorm.Model
-	Name       string   `json:"name" gorm:"not null"`
-	LocationID int      `json:"location_id"`
-	Location   Location `gorm:"foreignKey:LocationID"`
+	Name       string    `json:"name" gorm:"not null"`
+	LocationID int       `json:"location_id"`
+	Location   *Location `json:"location,omitempty" gorm:"foreignKey:LocationID"`
 }
 
 func (c *Court) Validate() error {

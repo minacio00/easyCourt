@@ -17,6 +17,7 @@ DB_PORT=5432
 DB_USER=your_db_user
 DB_NAME=your_db_name
 DB_PASSWORD=your_db_password
+JWT_SECRET=
 
 ## Running
 go run cmd/main.go

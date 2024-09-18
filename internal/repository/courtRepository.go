@@ -46,7 +46,9 @@ func (r *courtRepository) GetCourtByID(id int) (*model.Court, error) {
 }
 func (r *courtRepository) GetCourtByLocation(location_id int) (*[]model.Court, error) {
 	var courts []model.Court
-	err := r.db.Joins("locations").Where("locations.id = ?", location_id).First(&courts).Error
+	err := r.db.Joins("JOIN locations ON courts.location_id = locations.id").
+		Where("locations.id = ?", location_id).
+		Find(&courts).Error
 	return &courts, err
 }
 

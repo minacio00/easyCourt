@@ -432,21 +432,21 @@ paths:
       summary: Get court by ID
       tags:
       - court
-  /courts/location/{location_id}:
+  /courts/by-location:
     get:
       consumes:
       - application/json
       description: Retrieves all the courts from a location.
       parameters:
-      - description: Name of the location
-        in: path
-        name: location_name
+      - description: ID of the location
+        in: query
+        name: location_id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
-        "202":
+        "200":
           description: Court information
           schema:
             items:
@@ -458,7 +458,13 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Get the courts by location id
+        "500":
+          description: Error message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get courts by location ID
       tags:
       - court
   /location:

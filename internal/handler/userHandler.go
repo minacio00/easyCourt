@@ -90,6 +90,7 @@ func (h *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	var wg sync.WaitGroup
 	wg.Add(count)
 
+	// we don't need to wait for each MapUserToResponse execution to go to the next iteration
 	for i, v := range users {
 		go func(i int, v *model.User) {
 			defer wg.Done()

@@ -85,6 +85,7 @@ func NewRouter() http.Handler {
 		// Court routes
 		r.Route("/courts", func(r chi.Router) {
 			r.Post("/", courtHandler.CreateCourt)
+			r.Get("/by-location", courtHandler.GetCourtByLocation)
 			r.Get("/", courtHandler.GetAllCourts)
 			r.Get("/{id}", courtHandler.GetCourtByID)
 			r.Put("/", courtHandler.UpdateCourt)
