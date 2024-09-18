@@ -18,6 +18,41 @@ func NewTimeslotHandler(s service.TimeslotService) *timeSlotHandler {
 	return &timeSlotHandler{service: s}
 }
 
+// GetTimeslotsByCourt handles fetching all timeslots for a specific court
+// @Summary Get timeslots by court
+// @Description Retrieves all timeslots for a specific court
+// @Tags Timeslots
+// @Produce json
+// @Param courtID path int true "Court ID"
+// @Success 200 {array} model.Timeslot "List of timeslots for the court"
+// @Failure 400 {object} map[string]string "Invalid court ID"
+// @Failure 404 {object} map[string]string "Court not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /timeslots/{courtID} [get]
+func (h *timeSlotHandler) GetTimeslotsByCourt(w http.ResponseWriter, r *http.Request) {
+	courtIDStr := chi.URLParam(r, "courtID")
+	courtID, err := strconv.Atoi(courtIDStr)
+	if err != nil {
+		http.Error(w, "Invalid court ID", http.StatusBadRequest)
+		return
+	}
+
+	timeslots, err := h.service.GetTimeslotsByCourt(courtID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if len(timeslots) == 0 {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(timeslots)
+}
+
 // CreateTimeslot handles the creation of a new timeslot
 // @Summary Create a new timeslot
 // @Description Creates a new timeslot in the system

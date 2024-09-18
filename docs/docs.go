@@ -724,6 +724,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/timeslots/{courtID}": {
+            "get": {
+                "description": "Retrieves all timeslots for a specific court",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Timeslots"
+                ],
+                "summary": "Get timeslots by court",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Court ID",
+                        "name": "courtID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of timeslots for the court",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid court ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Court not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/timeslots/{id}": {
             "get": {
                 "description": "Retrieves a single timeslot by its ID",

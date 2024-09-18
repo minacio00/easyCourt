@@ -56,6 +56,7 @@ func NewRouter() http.Handler {
 			r.Put("/", timeslotHandler.UpdateTimeslot)
 			r.Get("/{id}", timeslotHandler.GetTimeslotByID)
 			r.Delete("/{id}", timeslotHandler.DeleteTimeslot)
+			r.Get("/{courtID}", timeslotHandler.GetTimeslotsByCourt)
 		})
 
 		r.Route("/bookings", func(r chi.Router) {

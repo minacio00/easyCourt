@@ -12,6 +12,7 @@ type TimeslotRepository interface {
 	UpdateTimeslot(timeslot *model.Timeslot) error
 	DeleteTimeslot(id int) error
 	GetActiveTimeslots() ([]model.Timeslot, error)
+	GetTimeslotsByCourt(courtID int) ([]model.ReadTimeslot, error)
 }
 
 type timeslotRepository struct {
@@ -20,6 +21,14 @@ type timeslotRepository struct {
 
 func NewTimeslotRepository(db *gorm.DB) TimeslotRepository {
 	return &timeslotRepository{db}
+}
+
+func (r *timeslotRepository) GetTimeslotsByCourt(courtID int) ([]model.ReadTimeslot, error) {
+	var timeslots []model.ReadTimeslot
+	if err := r.db.Where("court_id = ?", courtID).Model(&model.Timeslot{}).Order("day").Find(&timeslots).Error; err != nil {
+		return nil, err
+	}
+	return timeslots, nil
 }
 
 func (r *timeslotRepository) CreateTimeslot(timeslot *model.Timeslot) error {

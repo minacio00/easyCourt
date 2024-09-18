@@ -603,6 +603,45 @@ paths:
       summary: Create a new timeslot
       tags:
       - Timeslots
+  /timeslots/{courtID}:
+    get:
+      description: Retrieves all timeslots for a specific court
+      parameters:
+      - description: Court ID
+        in: path
+        name: courtID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of timeslots for the court
+          schema:
+            items:
+              $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot'
+            type: array
+        "400":
+          description: Invalid court ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Court not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get timeslots by court
+      tags:
+      - Timeslots
   /timeslots/{id}:
     delete:
       description: Deletes a timeslot by its ID
