@@ -102,25 +102,31 @@ func (h *CourtHandler) GetCourtByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(court)
 }
 
-// @Summary Get the courts by location id
+// @Summary Get courts by location ID
 // @Description Retrieves all the courts from a location.
 // @Tags court
 // @Accept json
 // @Produce json
-// @Param location_name path string true "Name of the location"
-// @Success 202 {object} []model.Court "Court information"
+// @Param location_id query int true "ID of the location"
+// @Success 200 {array} model.Court "Court information"
 // @Failure 400 {object} map[string]string "Error message"
-// @Router /courts/location/{location_id} [get]
+// @Failure 500 {object} map[string]string "Error message"
+// @Router /courts/by-location [get]
 func (h *CourtHandler) GetCourtByLocation(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "location_id")
-	location_id, err := strconv.Atoi(id)
-	if err != nil {
+	id := r.URL.Query().Get("location_id")
+	if id == "" {
 		http.Error(w, "missing location_id param", http.StatusBadRequest)
 		return
 	}
-	courts, err := h.service.GetCourtByLocation(location_id)
+
+	locationID, err := strconv.Atoi(id)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, "invalid location_id param", http.StatusBadRequest)
+		return
+	}
+	courts, err := h.service.GetCourtByLocation(locationID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}

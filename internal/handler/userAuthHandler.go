@@ -17,7 +17,7 @@ func NewUserAuthHandler(service service.UserService) *UserAuthHandler {
 
 func (h *UserAuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var credentials struct {
-		Email    string `json:"email"`
+		Phone    string `json:"phone"`
 		Password string `json:"password"`
 	}
 
@@ -26,11 +26,11 @@ func (h *UserAuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.service.Authenticate(credentials.Email, credentials.Password)
+	_, token, err := h.service.Authenticate(credentials.Phone, credentials.Password)
 	if err != nil {
 		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
 		return
 	}
 
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(map[string]string{"access_token": token})
 }

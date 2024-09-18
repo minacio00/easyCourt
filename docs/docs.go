@@ -358,7 +358,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/courts/location/{location_id}": {
+        "/courts/by-location": {
             "get": {
                 "description": "Retrieves all the courts from a location.",
                 "consumes": [
@@ -370,18 +370,18 @@ const docTemplate = `{
                 "tags": [
                     "court"
                 ],
-                "summary": "Get the courts by location id",
+                "summary": "Get courts by location ID",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Name of the location",
-                        "name": "location_name",
-                        "in": "path",
+                        "type": "integer",
+                        "description": "ID of the location",
+                        "name": "location_id",
+                        "in": "query",
                         "required": true
                     }
                 ],
                 "responses": {
-                    "202": {
+                    "200": {
                         "description": "Court information",
                         "schema": {
                             "type": "array",
@@ -391,6 +391,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
+                        "description": "Error message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
                         "description": "Error message",
                         "schema": {
                             "type": "object",
@@ -949,10 +958,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.User"
-                        }
+                        "description": "Created"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1205,6 +1211,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 },
                 "phone": {

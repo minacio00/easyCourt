@@ -18,7 +18,7 @@ import (
 func NewRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"http://*", "http://*"},
+		AllowedOrigins: []string{"http://*", "https://*"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders: []string{"Link"},
@@ -85,6 +85,7 @@ func NewRouter() http.Handler {
 		// Court routes
 		r.Route("/courts", func(r chi.Router) {
 			r.Post("/", courtHandler.CreateCourt)
+			r.Get("/by-location", courtHandler.GetCourtByLocation)
 			r.Get("/", courtHandler.GetAllCourts)
 			r.Get("/{id}", courtHandler.GetCourtByID)
 			r.Put("/", courtHandler.UpdateCourt)

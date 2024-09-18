@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/minacio00/easyCourt/internal/model"
@@ -26,7 +27,7 @@ func NewUserHandler(service service.UserService) *UserHandler {
 // @Accept  json
 // @Produce  json
 // @Param   user  body      model.User  true  "User data"
-// @Success 201  {object}  model.User
+// @Success 201
 // @Failure 400  {object}  model.APIError
 // @Router /users [post]
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -66,8 +67,8 @@ func (h *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-
-	json.NewEncoder(w).Encode(user)
+	resp := user.MapUserToResponse()
+	json.NewEncoder(w).Encode(resp)
 }
 
 // GetAllUsers retrieves all users
@@ -83,8 +84,22 @@ func (h *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	count := len(users)
 
-	json.NewEncoder(w).Encode(users)
+	resp := make([]model.UserResponse, count)
+	var wg sync.WaitGroup
+	wg.Add(count)
+
+	// we don't need to wait for each MapUserToResponse execution to go to the next iteration
+	for i, v := range users {
+		go func(i int, v *model.User) {
+			defer wg.Done()
+			resp[i] = *v.MapUserToResponse()
+		}(i, &v)
+	}
+	wg.Wait()
+
+	json.NewEncoder(w).Encode(resp)
 }
 
 // UpdateUser updates a user
