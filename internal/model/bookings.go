@@ -9,7 +9,7 @@ type Booking struct {
 	ID              int       `gorm:"primaryKey" json:"-"`
 	UserID          int       `json:"user_id" gorm:"foreignKey:UserID"` // Foreign key to User
 	User            User      `json:"user"`
-	Opponent        string    `json:"oponnent_name"`
+	Opponent        string    `json:"opponent_name"`
 	Partner         *string   `json:"partner_name"`
 	OpponentPartner *string   `json:"opponent_partner"`
 	TimeslotID      int       `json:"timeslot_id"`                    // Foreign key to Timeslot
@@ -24,7 +24,7 @@ func (bk *Booking) Validate() error {
 		errors = append(errors, "user_id is required")
 	}
 	if bk.Opponent == "" {
-		errors = append(errors, "oponnent is required")
+		errors = append(errors, "opponent is required")
 	}
 	if bk.Partner == nil && !bk.IsSinglesGame {
 		errors = append(errors, "partner_name is required for doubles games")
