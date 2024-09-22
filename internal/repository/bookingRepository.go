@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/minacio00/easyCourt/internal/model"
@@ -25,23 +26,28 @@ func NewBookingRepository(db *gorm.DB) BookingRepository {
 }
 
 func (r *bookingRepository) CreateBooking(booking *model.Booking) error {
-	var readTimeSlot = model.ReadTimeslot{ID: booking.TimeslotID}
-	if err := r.db.Model(&model.Timeslot{}).First(&readTimeSlot).Error; err != nil {
-		return err
+	var readTimeSlot model.ReadTimeslot
+	if err := r.db.Model(&model.Timeslot{}).Where("id = ?", booking.TimeslotID).First(&readTimeSlot).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("timeslot with ID %d not found", booking.TimeslotID)
+		}
+		return fmt.Errorf("error fetching timeslot: %w", err)
 	}
 
 	timeslot, err := readTimeSlot.ToTimeslot()
 	if err != nil {
-		return err
+		return fmt.Errorf("error converting ReadTimeslot to Timeslot: %w", err)
 	}
 
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(booking).Error; err != nil {
-			return err
+			return fmt.Errorf("error creating booking: %w", err)
 		}
+
 		if err := tx.Model(&timeslot).Update("booking_id", booking.ID).Error; err != nil {
-			return err
+			return fmt.Errorf("error updating timeslot with booking ID: %w", err)
 		}
+
 		return nil
 	})
 }
@@ -51,7 +57,7 @@ func (r *bookingRepository) CheckTimeslotAvailability(booking *model.Booking) er
 	result := r.db.Where(&model.Booking{TimeslotID: booking.TimeslotID}).First(&book)
 	if result.Error == nil {
 		// A booking was found, so the timeslot is not available
-		return fmt.Errorf("horário não disponível para a quadra %d", booking.TimeslotID)
+		return fmt.Errorf("timeslot already booked %d", booking.TimeslotID)
 	}
 
 	if result.Error == gorm.ErrRecordNotFound {
