@@ -724,7 +724,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/timeslots/{courtID}": {
+        "/timeslots/by_court": {
             "get": {
                 "description": "Retrieves all timeslots for a specific court",
                 "produces": [
@@ -738,9 +738,15 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Court ID",
-                        "name": "courtID",
-                        "in": "path",
+                        "name": "court_id",
+                        "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Weekday filter",
+                        "name": "day",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -753,17 +759,11 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "204": {
+                        "description": "No Content"
+                    },
                     "400": {
                         "description": "Invalid court ID",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Court not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -1127,12 +1127,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "user": {
-                    "description": "Relationship with User",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.User"
-                        }
-                    ]
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.UserResponse"
                 },
                 "user_id": {
                     "description": "Foreign key to User",
@@ -1234,6 +1229,12 @@ const docTemplate = `{
         "github_com_minacio00_easyCourt_internal_model.Timeslot": {
             "type": "object",
             "properties": {
+                "booking": {
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Booking"
+                },
+                "booking_id": {
+                    "type": "integer"
+                },
                 "court": {
                     "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Court"
                 },
@@ -1279,6 +1280,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_minacio00_easyCourt_internal_model.UserResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "isAdmin": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
                     "type": "string"
                 }
             }

@@ -24,9 +24,7 @@ definitions:
         description: Foreign key to Timeslot
         type: integer
       user:
-        allOf:
-        - $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.User'
-        description: Relationship with User
+        $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.UserResponse'
       user_id:
         description: Foreign key to User
         type: integer
@@ -92,6 +90,10 @@ definitions:
     type: object
   github_com_minacio00_easyCourt_internal_model.Timeslot:
     properties:
+      booking:
+        $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Booking'
+      booking_id:
+        type: integer
       court:
         $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Court'
       court_id:
@@ -122,6 +124,17 @@ definitions:
       phone:
         type: string
       updatedAt:
+        type: string
+    type: object
+  github_com_minacio00_easyCourt_internal_model.UserResponse:
+    properties:
+      id:
+        type: integer
+      isAdmin:
+        type: boolean
+      name:
+        type: string
+      phone:
         type: string
     type: object
   github_com_minacio00_easyCourt_internal_model.Weekday:
@@ -603,45 +616,6 @@ paths:
       summary: Create a new timeslot
       tags:
       - Timeslots
-  /timeslots/{courtID}:
-    get:
-      description: Retrieves all timeslots for a specific court
-      parameters:
-      - description: Court ID
-        in: path
-        name: courtID
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: List of timeslots for the court
-          schema:
-            items:
-              $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot'
-            type: array
-        "400":
-          description: Invalid court ID
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Court not found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get timeslots by court
-      tags:
-      - Timeslots
   /timeslots/{id}:
     delete:
       description: Deletes a timeslot by its ID
@@ -762,6 +736,45 @@ paths:
               type: string
             type: object
       summary: Get active timeslots
+      tags:
+      - Timeslots
+  /timeslots/by_court:
+    get:
+      description: Retrieves all timeslots for a specific court
+      parameters:
+      - description: Court ID
+        in: query
+        name: court_id
+        required: true
+        type: integer
+      - description: Weekday filter
+        in: query
+        name: day
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of timeslots for the court
+          schema:
+            items:
+              $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot'
+            type: array
+        "204":
+          description: No Content
+        "400":
+          description: Invalid court ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get timeslots by court
       tags:
       - Timeslots
   /users:

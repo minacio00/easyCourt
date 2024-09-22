@@ -19,13 +19,15 @@ const (
 )
 
 type Timeslot struct {
-	ID        int       `gorm:"primaryKey" json:"id"`
-	CourtID   *int      `json:"court_id"`
-	Court     Court     `gorm:"foreignKey:CourtID"`
-	Day       Weekday   `json:"week_day" gorm:"type:week_days;not null"`
-	StartTime time.Time `json:"start_time" gorm:"type:time"`
-	EndTime   time.Time `json:"end_time" gorm:"type:time"`
-	IsActive  bool      `gorm:"default:true"`
+	ID         int       `gorm:"primaryKey" json:"id"`
+	CourtID    *int      `json:"court_id"`
+	Court      Court     `gorm:"foreignKey:CourtID"`
+	Day        Weekday   `json:"week_day" gorm:"type:week_days;not null"`
+	StartTime  time.Time `json:"start_time" gorm:"type:time"`
+	EndTime    time.Time `json:"end_time" gorm:"type:time"`
+	IsActive   bool      `gorm:"default:true"`
+	Booking    *Booking  `json:"booking,omitempty"`
+	Booking_id *int      `json:"booking_id"`
 }
 
 func (t *Timeslot) Validate() error {
@@ -92,13 +94,15 @@ func (c *CreateTimeslot) ConvertCreateTimeslotToTimeslot() (*Timeslot, error) {
 }
 
 type ReadTimeslot struct {
-	ID        int     `json:"id"`
-	CourtID   *int    `json:"court_id"`
-	Court     Court   `json:"-"`
-	Day       Weekday `json:"week_day"`
-	StartTime string  `json:"start_time"`
-	EndTime   string  `json:"end_time"`
-	IsActive  bool    `json:"is_active"`
+	ID         int      `json:"id"`
+	CourtID    *int     `json:"court_id"`
+	Court      Court    `json:"-"`
+	Day        Weekday  `json:"week_day"`
+	StartTime  string   `json:"start_time"`
+	EndTime    string   `json:"end_time"`
+	IsActive   bool     `json:"is_active"`
+	Booking    *Booking `json:"booking"`
+	Booking_id *int     `json:"booking_id"`
 }
 
 func (rt *ReadTimeslot) ToTimeslot() (*Timeslot, error) {
