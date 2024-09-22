@@ -23,12 +23,12 @@ type UserService interface {
 
 type userService struct {
 	repo      repository.UserRepository
-	jwtSecret string
+	jwtSecret []byte
 }
 
 func NewUserService(repo repository.UserRepository) UserService {
 	secret := viper.GetString("JWT_SECRET")
-	return &userService{repo, secret}
+	return &userService{repo, []byte(secret)}
 }
 
 func (s *userService) CreateUser(user *model.User) error {
