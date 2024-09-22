@@ -1110,7 +1110,7 @@ const docTemplate = `{
                     "description": "Date of the booking",
                     "type": "string"
                 },
-                "oponnent_name": {
+                "opponent_name": {
                     "type": "string"
                 },
                 "opponent_partner": {
