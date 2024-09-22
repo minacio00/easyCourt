@@ -36,7 +36,7 @@ func NewRouter() http.Handler {
 	userService := service.NewUserService(userRepo)
 	locationService := service.NewLocationService(locationRepo)
 	courtService := service.NewCourtService(courtRepo)
-	bookingsService := service.NewBookingService(bookingsRepo)
+	bookingsService := service.NewBookingService(bookingsRepo, userRepo)
 	timeslotService := service.NewTimeslotService(timeslotRepo, courtRepo)
 
 	// Set up handlers

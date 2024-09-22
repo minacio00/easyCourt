@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"sync"
 
 	"github.com/minacio00/easyCourt/internal/model"
@@ -25,11 +26,12 @@ type BookingService interface {
 }
 
 type bookingService struct {
-	repo repository.BookingRepository
+	repo      repository.BookingRepository
+	user_repo repository.UserRepository
 }
 
-func NewBookingService(repo repository.BookingRepository) BookingService {
-	return &bookingService{repo}
+func NewBookingService(repo repository.BookingRepository, user repository.UserRepository) BookingService {
+	return &bookingService{repo, user}
 }
 
 func (s *bookingService) CreateBooking(booking *model.Booking) error {
@@ -38,6 +40,9 @@ func (s *bookingService) CreateBooking(booking *model.Booking) error {
 	}
 	if err := s.repo.CheckTimeslotAvailability(booking); err != nil {
 		return err
+	}
+	if _, err := s.user_repo.GetUserByID(uint(booking.UserID)); err != nil {
+		return errors.New("user not found")
 	}
 
 	mutex := getTimeslotMutex(booking.TimeslotID)
