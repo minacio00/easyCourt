@@ -36,6 +36,10 @@ func (s *userService) CreateUser(user *model.User) error {
 	if err != nil {
 		return err
 	}
+	usr, _ := s.repo.GetUserByPhone(user.Phone)
+	if usr != nil {
+		return errors.New("phone already in use")
+	}
 	user.Password = string(hashedPassword)
 	return s.repo.CreateUser(user)
 }

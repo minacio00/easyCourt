@@ -40,7 +40,8 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	user := body.MapCreateToUser()
 
 	if err := h.service.CreateUser(user); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
