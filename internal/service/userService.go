@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -16,7 +17,8 @@ type UserService interface {
 	GetAllUsers() ([]model.User, error)
 	UpdateUser(user *model.User) error
 	DeleteUser(id uint) error
-	Authenticate(phone, password string) (*model.User, string, error)
+	Authenticate(phone, password string) (*model.User, string, string, error)
+	RefreshToken(refreshToken string) (string, string, error)
 }
 
 type userService struct {
@@ -54,27 +56,64 @@ func (s *userService) DeleteUser(id uint) error {
 	return s.repo.DeleteUser(id)
 }
 
-// need to return jwt
-func (s *userService) Authenticate(phone, password string) (*model.User, string, error) {
+func (s *userService) Authenticate(phone, password string) (*model.User, string, string, error) {
 	user, err := s.repo.GetUserByPhone(phone)
 	if err != nil {
-		return nil, "", err
+		return nil, "", "", err
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return nil, "", err
+		return nil, "", "", err
 	}
-	tokenExpiresIn := 24 * time.Hour
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": user.ID,
-		"phone":   user.Phone,
-		"exp":     time.Now().Add(tokenExpiresIn).Unix(),
+
+	accessToken, err := s.generateToken(user.ID, "access", 15*time.Minute)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	refreshToken, err := s.generateToken(user.ID, "refresh", 7*24*time.Hour)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	return user, accessToken, refreshToken, nil
+}
+func (s *userService) generateToken(userID uint, tokenType string, expiration time.Duration) (string, error) {
+	claims := jwt.MapClaims{
+		"user_id": userID,
+		"type":    tokenType,
+		"exp":     time.Now().Add(expiration).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(s.jwtSecret)
+}
+
+func (s *userService) RefreshToken(refreshToken string) (string, string, error) {
+	claims := jwt.MapClaims{}
+	token, err := jwt.ParseWithClaims(refreshToken, claims, func(token *jwt.Token) (interface{}, error) {
+		return s.jwtSecret, nil
 	})
 
-	tokenString, err := token.SignedString(s.jwtSecret)
-	if err != nil {
-		return nil, "", err
+	if err != nil || !token.Valid {
+		return "", "", errors.New("invalid refresh token")
 	}
 
-	return user, tokenString, nil
+	if claims["type"] != "refresh" {
+		return "", "", errors.New("invalid token type")
+	}
+
+	userID := uint(claims["user_id"].(float64))
+
+	newAccessToken, err := s.generateToken(userID, "access", 24*time.Hour)
+	if err != nil {
+		return "", "", err
+	}
+
+	newRefreshToken, err := s.generateToken(userID, "refresh", 7*24*time.Hour)
+	if err != nil {
+		return "", "", err
+	}
+
+	return newAccessToken, newRefreshToken, nil
 }
