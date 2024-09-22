@@ -724,7 +724,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/timeslots/by_court": {
+        "/timeslots/by-court": {
             "get": {
                 "description": "Retrieves all timeslots for a specific court",
                 "produces": [

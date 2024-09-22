@@ -29,7 +29,7 @@ func NewTimeslotHandler(s service.TimeslotService) *timeSlotHandler {
 // @Success 204 "No Content"
 // @Failure 400 {object} map[string]string "Invalid court ID"
 // @Failure 500 {object} map[string]string "Internal server error"
-// @Router /timeslots/by_court [get]
+// @Router /timeslots/by-court [get]
 func (h *timeSlotHandler) GetTimeslotsByCourt(w http.ResponseWriter, r *http.Request) {
 	weekDay := r.URL.Query().Get("day")
 	courtIDStr := r.URL.Query().Get("court_id")
