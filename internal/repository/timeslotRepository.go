@@ -27,7 +27,7 @@ func (r *timeslotRepository) GetTimeslotsByCourt(courtID int, weekDay string) ([
 	var timeslots []model.ReadTimeslot
 
 	query := r.db.Model(&model.Timeslot{}).
-		Preload("Booking").
+		Preload("Booking.User").
 		Where("court_id = ?", courtID)
 
 	if weekDay != "" {

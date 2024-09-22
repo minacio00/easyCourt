@@ -26,18 +26,20 @@ func NewUserHandler(service service.UserService) *UserHandler {
 // @Tags users
 // @Accept  json
 // @Produce  json
-// @Param   user  body      model.User  true  "User data"
+// @Param   user  body      model.CreateUser  true  "User data"
 // @Success 201
 // @Failure 400  {object}  model.APIError
 // @Router /users [post]
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
-	var user model.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	var body model.CreateUser
+
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	user := body.MapCreateToUser()
 
-	if err := h.service.CreateUser(&user); err != nil {
+	if err := h.service.CreateUser(user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

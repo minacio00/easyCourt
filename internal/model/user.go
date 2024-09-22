@@ -1,13 +1,15 @@
 package model
 
-import "gorm.io/gorm"
+import "time"
 
 type User struct {
-	gorm.Model
-	Name     string `json:"name"`
-	Phone    string `json:"phone"`
-	Password string `json:"password" gorm:"unique; not null"`
-	IsAdmin  bool   `json:"-"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	Name      string    `json:"name"`
+	Phone     string    `json:"phone"`
+	Password  string    `json:"-"`
+	IsAdmin   bool      `json:"isAdmin"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
 }
 type UserResponse struct {
 	ID       uint   `json:"id"`
@@ -15,6 +17,22 @@ type UserResponse struct {
 	Phone    string `json:"phone"`
 	Password string `json:"-"`
 	IsAdmin  bool   `json:"isAdmin"`
+}
+type CreateUser struct {
+	ID       uint   `json:"id"`
+	Name     string `json:"name"`
+	Phone    string `json:"phone"`
+	Password string `json:"password"`
+	IsAdmin  bool   `json:"-"`
+}
+
+func (u *CreateUser) MapCreateToUser() *User {
+	return &User{
+		ID:      u.ID,
+		Name:    u.Name,
+		Phone:   u.Phone,
+		IsAdmin: u.IsAdmin,
+	}
 }
 
 func (u *User) MapUserToResponse() *UserResponse {
