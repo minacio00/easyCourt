@@ -12,7 +12,7 @@ type TimeslotRepository interface {
 	UpdateTimeslot(timeslot *model.Timeslot) error
 	DeleteTimeslot(id int) error
 	GetActiveTimeslots() ([]model.Timeslot, error)
-	GetTimeslotsByCourt(courtID int) ([]model.ReadTimeslot, error)
+	GetTimeslotsByCourt(courtID int, weekDay string) ([]model.ReadTimeslot, error)
 }
 
 type timeslotRepository struct {
@@ -23,14 +23,25 @@ func NewTimeslotRepository(db *gorm.DB) TimeslotRepository {
 	return &timeslotRepository{db}
 }
 
-func (r *timeslotRepository) GetTimeslotsByCourt(courtID int) ([]model.ReadTimeslot, error) {
+func (r *timeslotRepository) GetTimeslotsByCourt(courtID int, weekDay string) ([]model.ReadTimeslot, error) {
 	var timeslots []model.ReadTimeslot
-	if err := r.db.Where("court_id = ?", courtID).Model(&model.Timeslot{}).Order("day").Find(&timeslots).Error; err != nil {
+
+	query := r.db.Model(&model.Timeslot{}).
+		Preload("Booking").
+		Where("court_id = ?", courtID)
+
+	if weekDay != "" {
+		query = query.Where("day = ?", weekDay)
+	} else {
+		query = query.Order("day ASC")
+	}
+
+	if err := query.Order("start_time ASC").Find(&timeslots).Error; err != nil {
 		return nil, err
 	}
 	return timeslots, nil
-}
 
+}
 func (r *timeslotRepository) CreateTimeslot(timeslot *model.Timeslot) error {
 	println(&timeslot.CourtID)
 	return r.db.Create(timeslot).Error

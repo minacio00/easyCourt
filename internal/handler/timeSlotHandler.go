@@ -23,21 +23,23 @@ func NewTimeslotHandler(s service.TimeslotService) *timeSlotHandler {
 // @Description Retrieves all timeslots for a specific court
 // @Tags Timeslots
 // @Produce json
-// @Param courtID path int true "Court ID"
+// @Param court_id query int true "Court ID"
+// @Param day query string false "Weekday filter"
 // @Success 200 {array} model.Timeslot "List of timeslots for the court"
+// @Success 204 "No Content"
 // @Failure 400 {object} map[string]string "Invalid court ID"
-// @Failure 404 {object} map[string]string "Court not found"
 // @Failure 500 {object} map[string]string "Internal server error"
-// @Router /timeslots/{courtID} [get]
+// @Router /timeslots/by-court [get]
 func (h *timeSlotHandler) GetTimeslotsByCourt(w http.ResponseWriter, r *http.Request) {
-	courtIDStr := chi.URLParam(r, "courtID")
+	weekDay := r.URL.Query().Get("day")
+	courtIDStr := r.URL.Query().Get("court_id")
 	courtID, err := strconv.Atoi(courtIDStr)
 	if err != nil {
 		http.Error(w, "Invalid court ID", http.StatusBadRequest)
 		return
 	}
 
-	timeslots, err := h.service.GetTimeslotsByCourt(courtID)
+	timeslots, err := h.service.GetTimeslotsByCourt(courtID, weekDay)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

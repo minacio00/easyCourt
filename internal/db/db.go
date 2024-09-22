@@ -3,12 +3,14 @@ package db
 import (
 	"fmt"
 	"log"
+	"os"
 	"sync"
 
 	"github.com/minacio00/easyCourt/internal/model"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var (
@@ -31,7 +33,14 @@ func Init() {
 		)
 
 		// Connect to the database
-		DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+			Logger: logger.New(
+				log.New(os.Stdout, "\r\n", log.LstdFlags),
+				logger.Config{
+					LogLevel: logger.Info,
+				},
+			),
+		})
 		if err != nil {
 			log.Fatalf("failed to connect to the database: %v", err)
 		}

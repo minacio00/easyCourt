@@ -25,33 +25,41 @@ func NewBookingRepository(db *gorm.DB) BookingRepository {
 }
 
 func (r *bookingRepository) CreateBooking(booking *model.Booking) error {
-	return r.db.Create(booking).Error
+	var readTimeSlot = model.ReadTimeslot{ID: booking.TimeslotID}
+	if err := r.db.Model(&model.Timeslot{}).First(&readTimeSlot).Error; err != nil {
+		return err
+	}
+
+	timeslot, err := readTimeSlot.ToTimeslot()
+	if err != nil {
+		return err
+	}
+
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(booking).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&timeslot).Update("booking_id", booking.ID).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func (r *bookingRepository) CheckTimeslotAvailability(booking *model.Booking) error {
-	// var book model.CreateBooking
-	// result := r.db.Preload("Timeslot").Where("timeslot_id = ?", booking.TimeslotID).First(&book)
-	// if result.RowsAffected > 0 {
-	// 	return fmt.Errorf("horário não disponível para a quadra %d", &booking.TimeslotID)
-	// }
-	query := `
-		SELECT b.id, b.timeslot_id, t.start_time, t.end_time
-		from bookings b
-		JOIN timeslots t ON b.timeslot_id = t.id
-		WHERE b.timeslot_id = ?
-		LIMIT 1
-	`
-	var result map[string]interface{}
-	err := r.db.Raw(query, booking.TimeslotID).Scan(&result).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			// Timeslot is available
-			return nil
-		}
-		// Other database error occurred
-		return fmt.Errorf("error checking timeslot availability: %w", err)
+	var book model.Booking
+	result := r.db.Where(&model.Booking{TimeslotID: booking.TimeslotID}).First(&book)
+	if result.Error == nil {
+		// A booking was found, so the timeslot is not available
+		return fmt.Errorf("horário não disponível para a quadra %d", booking.TimeslotID)
 	}
-	return fmt.Errorf("horário não disponível para a quadra %d", booking.TimeslotID)
+
+	if result.Error == gorm.ErrRecordNotFound {
+		// No booking was found, so the timeslot is available
+		return nil
+	}
+
+	return fmt.Errorf("error checking timeslot availability: %w", result.Error)
 }
 
 func (r *bookingRepository) GetBookingByID(id int) (*model.Booking, error) {

@@ -15,7 +15,7 @@ type TimeslotService interface {
 	UpdateTimeslot(timeslot *model.Timeslot) error
 	DeleteTimeslot(id int) error
 	GetActiveTimeslots() ([]model.Timeslot, error)
-	GetTimeslotsByCourt(courtID int) ([]model.ReadTimeslot, error)
+	GetTimeslotsByCourt(courtID int, weekDay string) ([]model.ReadTimeslot, error)
 }
 
 type timeslotService struct {
@@ -27,15 +27,15 @@ func NewTimeslotService(repo repository.TimeslotRepository, court_repo repositor
 	return &timeslotService{repo, court_repo}
 }
 
-func (s *timeslotService) GetTimeslotsByCourt(courtID int) ([]model.ReadTimeslot, error) {
+func (s *timeslotService) GetTimeslotsByCourt(courtID int, weekDay string) ([]model.ReadTimeslot, error) {
 	// First, check if the court exists
 	_, err := s.courtRepo.GetCourtByID(courtID)
 	if err != nil {
 		return nil, err
 	}
-
+	//todo: parse weekDay string
 	// If the court exists, get its timeslots
-	return s.repo.GetTimeslotsByCourt(courtID)
+	return s.repo.GetTimeslotsByCourt(courtID, weekDay)
 }
 func (s *timeslotService) CreateTimeslot(timeslot *model.Timeslot) error {
 	if err := timeslot.Validate(); err != nil {
