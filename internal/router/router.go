@@ -95,6 +95,7 @@ func NewRouter() http.Handler {
 
 		// Authentication route
 		r.Post("/login", userAuthHandler.Login)
+		r.Post("/refresh", userAuthHandler.Refresh)
 	})
 
 	// Swagger documentation

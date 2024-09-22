@@ -157,6 +157,18 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
+  internal_handler.Credentials:
+    properties:
+      password:
+        type: string
+      phone:
+        type: string
+    type: object
+  internal_handler.Refresh:
+    properties:
+      refresh_token:
+        type: string
+    type: object
 info:
   contact: {}
   description: This is a comprehensive API for the EasyCourt system.
@@ -560,6 +572,71 @@ paths:
       summary: Delete a location by ID
       tags:
       - location
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return access and refresh tokens
+      parameters:
+      - description: Login Credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handler.Credentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+      summary: User login
+      tags:
+      - authentication
+  /refresh:
+    post:
+      consumes:
+      - application/json
+      description: Use a refresh token to obtain a new access token and refresh token
+        pair
+      parameters:
+      - description: Refresh Token
+        in: body
+        name: refresh
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handler.Refresh'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+      summary: Refresh access token
+      tags:
+      - authentication
   /timeslots:
     get:
       description: Retrieves all timeslots
