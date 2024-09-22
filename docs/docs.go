@@ -1011,7 +1011,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.User"
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.CreateUser"
                         }
                     }
                 ],
@@ -1127,7 +1127,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "user": {
-                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.UserResponse"
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.User"
                 },
                 "user_id": {
                     "description": "Foreign key to User",
@@ -1212,6 +1212,23 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_minacio00_easyCourt_internal_model.CreateUser": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_minacio00_easyCourt_internal_model.Location": {
             "type": "object",
             "properties": {
@@ -1259,32 +1276,6 @@ const docTemplate = `{
             }
         },
         "github_com_minacio00_easyCourt_internal_model.User": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_minacio00_easyCourt_internal_model.UserResponse": {
             "type": "object",
             "properties": {
                 "id": {
