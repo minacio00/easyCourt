@@ -28,10 +28,11 @@ type CreateUser struct {
 
 func (u *CreateUser) MapCreateToUser() *User {
 	return &User{
-		ID:      u.ID,
-		Name:    u.Name,
-		Phone:   u.Phone,
-		IsAdmin: u.IsAdmin,
+		ID:       u.ID,
+		Name:     u.Name,
+		Phone:    u.Phone,
+		IsAdmin:  u.IsAdmin,
+		Password: u.Password,
 	}
 }
 

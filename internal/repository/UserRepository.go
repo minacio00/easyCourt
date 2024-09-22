@@ -26,7 +26,7 @@ func (r *userRepository) CreateUser(user *model.User) error {
 }
 func (r *userRepository) GetUserByPhone(phone string) (*model.User, error) {
 	var user model.User
-	if err := r.db.First(&user, phone).Error; err != nil {
+	if err := r.db.Where("phone = ?", phone).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil

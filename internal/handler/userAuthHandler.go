@@ -44,6 +44,7 @@ func (h *UserAuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	_, token, refresh, err := h.service.Authenticate(credentials.Phone, credentials.Password)
 	if err != nil {
+		println(err.Error())
 		http.Error(w, "Invalid phone or password", http.StatusUnauthorized)
 		return
 	}
