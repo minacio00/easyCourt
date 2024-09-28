@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 )
 
@@ -54,38 +53,24 @@ func (t *Timeslot) Validate() error {
 }
 
 type CreateTimeslot struct {
-	CourtID   *string `json:"court_id"`
+	CourtID   *int    `json:"court_id"`
 	Day       Weekday `json:"week_day"`
 	StartTime string  `json:"start_time"`
 	EndTime   string  `json:"end_time"`
-	IsActive  bool    `json:"isActive"`
+	IsActive  bool    `json:"is_active"`
 }
 
 func (c *CreateTimeslot) ConvertCreateTimeslotToTimeslot() (*Timeslot, error) {
-
 	startTime, err := time.Parse("15:04:05", c.StartTime)
 	if err != nil {
 		return nil, fmt.Errorf("invalid start_time format: %v", err)
 	}
-
 	endTime, err := time.Parse("15:04:05", c.EndTime)
 	if err != nil {
 		return nil, fmt.Errorf("invalid end_time format: %v", err)
 	}
-
-	var courtID *int
-	if c.CourtID != nil {
-		id, err := strconv.Atoi(*c.CourtID)
-		if err != nil {
-			return nil, fmt.Errorf("invalid court_id: %v", err)
-		}
-		courtID = &id
-	} else {
-		return nil, fmt.Errorf("court_id is required: %v", err)
-	}
-
 	return &Timeslot{
-		CourtID:   courtID,
+		CourtID:   c.CourtID,
 		Day:       c.Day,
 		StartTime: startTime,
 		EndTime:   endTime,

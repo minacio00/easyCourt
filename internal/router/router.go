@@ -51,8 +51,8 @@ func NewRouter() http.Handler {
 	r.Route("/api/v1", func(r chi.Router) {
 
 		r.Route("/timeslots", func(r chi.Router) {
+			r.Put("/{id}", timeslotHandler.UpdateTimeslot)
 			r.Post("/", timeslotHandler.CreateTimeslot)
-			r.Put("/", timeslotHandler.UpdateTimeslot)
 			r.Get("/{id}", timeslotHandler.GetTimeslotByID)
 			r.Delete("/{id}", timeslotHandler.DeleteTimeslot)
 			r.Get("/by-court", timeslotHandler.GetTimeslotsByCourt)
