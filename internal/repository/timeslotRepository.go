@@ -48,13 +48,16 @@ func (r *timeslotRepository) CreateTimeslot(timeslot *model.Timeslot) error {
 }
 
 func (r *timeslotRepository) GetTimeslotByID(id int) (*model.Timeslot, error) {
-	var timeslot model.Timeslot
-	if err := r.db.Preload("Court").First(&timeslot, id).Error; err != nil {
+	var timeslot model.ReadTimeslot
+	if err := r.db.Model(&model.Timeslot{}).Preload("Court").First(&timeslot, id).Error; err != nil {
 		return nil, err
 	}
-	return &timeslot, nil
+	s, err := timeslot.ToTimeslot()
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
 }
-
 func (r *timeslotRepository) GetAllTimeslots() ([]model.ReadTimeslot, error) {
 	var timeslots []model.ReadTimeslot
 	if err := r.db.Preload("Court").Model(&model.Timeslot{}).Find(&timeslots).Error; err != nil {
@@ -64,7 +67,13 @@ func (r *timeslotRepository) GetAllTimeslots() ([]model.ReadTimeslot, error) {
 }
 
 func (r *timeslotRepository) UpdateTimeslot(timeslot *model.Timeslot) error {
-	return r.db.Save(timeslot).Error
+	return r.db.Model(&model.Timeslot{}).Where("id = ?", timeslot.ID).Updates(map[string]interface{}{
+		"court_id":   timeslot.CourtID,
+		"day":        timeslot.Day,
+		"start_time": timeslot.StartTime,
+		"end_time":   timeslot.EndTime,
+		"is_active":  timeslot.IsActive,
+	}).Error
 }
 
 func (r *timeslotRepository) DeleteTimeslot(id int) error {

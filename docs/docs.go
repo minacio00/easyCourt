@@ -1013,7 +1013,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot"
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.CreateTimeslot"
                         }
                     }
                 ],
@@ -1354,12 +1354,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "court_id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "end_time": {
                     "type": "string"
                 },
-                "isActive": {
+                "is_active": {
                     "type": "boolean"
                 },
                 "start_time": {

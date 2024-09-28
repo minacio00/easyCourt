@@ -77,8 +77,25 @@ func (s *timeslotService) GetAllTimeslots() ([]model.ReadTimeslot, error) {
 }
 
 func (s *timeslotService) UpdateTimeslot(timeslot *model.Timeslot) error {
-	// Add any additional logic before updating a timeslot, if necessary
-	return s.repo.UpdateTimeslot(timeslot)
+	// Validate the timeslot
+	if err := timeslot.Validate(); err != nil {
+		return err
+	}
+
+	// Check if the timeslot exists
+	existingTimeslot, err := s.repo.GetTimeslotByID(timeslot.ID)
+	if err != nil {
+		return fmt.Errorf("timeslot with id %d does not exist: %w", timeslot.ID, err)
+	}
+
+	// Update only the fields that are allowed to be updated
+	existingTimeslot.CourtID = timeslot.CourtID
+	existingTimeslot.Day = timeslot.Day
+	existingTimeslot.StartTime = timeslot.StartTime
+	existingTimeslot.EndTime = timeslot.EndTime
+	existingTimeslot.IsActive = timeslot.IsActive
+
+	return s.repo.UpdateTimeslot(existingTimeslot)
 }
 
 func (s *timeslotService) DeleteTimeslot(id int) error {

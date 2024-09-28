@@ -151,7 +151,7 @@ func (h *timeSlotHandler) GetTimeslotByID(w http.ResponseWriter, r *http.Request
 // @Accept  json
 // @Produce  json
 // @Param id path int true "Timeslot ID"
-// @Param timeslot body model.Timeslot true "Updated timeslot data"
+// @Param timeslot body model.CreateTimeslot true "Updated timeslot data"
 // @Success 200 {object} map[string]string "Timeslot updated successfully"
 // @Failure 400 {object} map[string]string "Invalid input or ID"
 // @Failure 500 {object} map[string]string "Internal server error"
@@ -165,15 +165,22 @@ func (h *timeSlotHandler) UpdateTimeslot(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	var timeSlot model.Timeslot
-	if err := json.NewDecoder(r.Body).Decode(&timeSlot); err != nil {
+	var updateTimeslot model.CreateTimeslot
+	if err := json.NewDecoder(r.Body).Decode(&updateTimeslot); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
-	timeSlot.ID = id // Set the ID from the URL param
 
-	if err := h.service.UpdateTimeslot(&timeSlot); err != nil {
+	slot, err := updateTimeslot.ConvertCreateTimeslotToTimeslot()
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+	slot.ID = id // Set the ID from the URL param
+
+	if err := h.service.UpdateTimeslot(slot); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
