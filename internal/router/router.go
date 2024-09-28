@@ -72,6 +72,7 @@ func NewRouter() http.Handler {
 			r.Get("/", locationHandler.GetAllLocations)
 			r.Put("/", locationHandler.UpdateLocation)
 			r.Delete("/{id}", locationHandler.DeleteLocation)
+			r.Post("/{id}/image", locationHandler.UploadLocationImage)
 		})
 
 		// User routes

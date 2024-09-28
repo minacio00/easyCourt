@@ -572,6 +572,46 @@ paths:
       summary: Delete a location by ID
       tags:
       - location
+  /location/{id}/image:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload an image file for a specific location and store it in S3
+      parameters:
+      - description: Location ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Image file to upload
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns a success message and the URL of the uploaded image
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+        "404":
+          description: Location not found
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.APIError'
+      summary: Upload a location image
+      tags:
+      - location
   /login:
     post:
       consumes:
