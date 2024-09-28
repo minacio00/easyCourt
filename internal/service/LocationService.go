@@ -12,6 +12,7 @@ type LocationService interface {
 	GetAllLocations() ([]model.Location, error)
 	UpdateLocation(location *model.Location) error
 	DeleteLocation(id uint) error
+	GetLocationById(id uint) (*model.Location, error)
 }
 
 type locationService struct {
@@ -22,6 +23,9 @@ func NewLocationService(repo repository.LocationRepository) LocationService {
 	return &locationService{repo}
 }
 
+func (s *locationService) GetLocationById(id uint) (*model.Location, error) {
+	return s.repo.GetLocationById(id)
+}
 func (s *locationService) CreateLocation(location *model.Location) error {
 	if location.Name != "" {
 		println(location.Name)

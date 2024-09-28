@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/minacio00/easyCourt/internal/model"
 	"gorm.io/gorm"
 )
@@ -11,6 +13,7 @@ type LocationRepository interface {
 	UpdateLocation(location *model.Location) error
 	GetAllLocationCourts(location_id uint) ([]model.Court, error)
 	DeleteLocation(id uint) error
+	GetLocationById(id uint) (*model.Location, error)
 }
 
 type locationRepository struct {
@@ -21,6 +24,17 @@ func NewLocationRepository(db *gorm.DB) LocationRepository {
 	return &locationRepository{db}
 }
 
+func (l *locationRepository) GetLocationById(id uint) (*model.Location, error) {
+	var location *model.Location
+	result := l.db.First(&location, id)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("location not found")
+		}
+		return nil, result.Error
+	}
+	return location, nil
+}
 func (l *locationRepository) CreateLocation(location *model.Location) error {
 	return l.db.Create(location).Error
 }
