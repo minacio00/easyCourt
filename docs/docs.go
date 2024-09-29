@@ -50,7 +50,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Booking"
+                                "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.ReadBooking"
                             }
                         }
                     },
@@ -1401,6 +1401,70 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_minacio00_easyCourt_internal_model.ReadBooking": {
+            "type": "object",
+            "properties": {
+                "booking_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "opponent_name": {
+                    "type": "string"
+                },
+                "opponent_partner": {
+                    "type": "string"
+                },
+                "partner_name": {
+                    "type": "string"
+                },
+                "singles_flag": {
+                    "type": "boolean"
+                },
+                "timeslot": {
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.ReadTimeslot"
+                },
+                "timeslot_id": {
+                    "type": "integer"
+                },
+                "user": {
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.User"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_minacio00_easyCourt_internal_model.ReadTimeslot": {
+            "type": "object",
+            "properties": {
+                "booking": {
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Booking"
+                },
+                "booking_id": {
+                    "type": "integer"
+                },
+                "court_id": {
+                    "type": "integer"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "week_day": {
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Weekday"
+                }
+            }
+        },
         "github_com_minacio00_easyCourt_internal_model.Timeslot": {
             "type": "object",
             "properties": {
@@ -1422,7 +1486,7 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "isActive": {
+                "is_active": {
                     "type": "boolean"
                 },
                 "start_time": {

@@ -81,7 +81,7 @@ func (h *BookingHandler) GetBookingByID(w http.ResponseWriter, r *http.Request) 
 // @Produce      json
 // @Param        limit  query int false "Number of bookings to retrieve" default(10)
 // @Param        offset query int false "Offset of bookings" default(0)
-// @Success      200 {array} model.Booking
+// @Success      200 {array} model.ReadBooking
 // @Failure      500 {string} string "Internal server error"
 // @Router       /bookings [get]
 func (h *BookingHandler) GetAllBookings(w http.ResponseWriter, r *http.Request) {

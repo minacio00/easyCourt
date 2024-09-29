@@ -62,3 +62,16 @@ func (cb *CreateBooking) ConvertToBooking() *Booking {
 		IsSinglesGame:   cb.IsSinglesGame,
 	}
 }
+
+type ReadBooking struct {
+	ID              int          `gorm:"primaryKey" json:"id"`
+	UserID          int          `json:"user_id"`
+	User            User         `json:"user"`
+	Opponent        string       `json:"opponent_name"`
+	Partner         *string      `json:"partner_name"`
+	OpponentPartner *string      `json:"opponent_partner"`
+	TimeslotID      int          `json:"timeslot_id"`
+	Timeslot        ReadTimeslot `json:"timeslot"`
+	BookingDate     time.Time    `json:"booking_date"`
+	IsSinglesGame   bool         `json:"singles_flag"`
+}
