@@ -61,9 +61,10 @@ func NewRouter() http.Handler {
 
 		r.Route("/bookings", func(r chi.Router) {
 			r.Post("/", bookingHandler.CreateBooking)
-			r.Get("/", bookingHandler.GetAllBookings)
 			r.Put("/", bookingHandler.UpdateBooking)
 			r.Delete("/", bookingHandler.DeleteBooking)
+			r.Get("/{id}", bookingHandler.GetBookingByID)
+			r.Get("/", bookingHandler.GetAllBookings)
 		})
 
 		// Location routes

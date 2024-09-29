@@ -19,7 +19,7 @@ func getTimeslotMutex(timeslotID int) *sync.Mutex {
 
 type BookingService interface {
 	CreateBooking(booking *model.Booking) error
-	GetBookingByID(id int) (*model.Booking, error)
+	GetBookingByID(id int) (*model.ReadBooking, error)
 	GetAllBookings(limit, offeset int) (*[]model.ReadBooking, error)
 	UpdateBooking(booking *model.Booking) error
 	DeleteBooking(id int) error
@@ -54,7 +54,7 @@ func (s *bookingService) CreateBooking(booking *model.Booking) error {
 	return s.repo.CreateBooking(booking)
 }
 
-func (s *bookingService) GetBookingByID(id int) (*model.Booking, error) {
+func (s *bookingService) GetBookingByID(id int) (*model.ReadBooking, error) {
 	return s.repo.GetBookingByID(id)
 }
 

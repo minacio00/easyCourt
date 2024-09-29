@@ -10,7 +10,7 @@ import (
 
 type BookingRepository interface {
 	CreateBooking(booking *model.Booking) error
-	GetBookingByID(id int) (*model.Booking, error)
+	GetBookingByID(id int) (*model.ReadBooking, error)
 	GetAllBookings(limit, offset int) (*[]model.ReadBooking, error)
 	UpdateBooking(booking *model.Booking) error
 	DeleteBooking(id int) error
@@ -68,9 +68,11 @@ func (r *bookingRepository) CheckTimeslotAvailability(booking *model.Booking) er
 	return fmt.Errorf("error checking timeslot availability: %w", result.Error)
 }
 
-func (r *bookingRepository) GetBookingByID(id int) (*model.Booking, error) {
-	var booking model.Booking
-	if err := r.db.Preload("User").Preload("Timeslot").First(&booking, id).Error; err != nil {
+func (r *bookingRepository) GetBookingByID(id int) (*model.ReadBooking, error) {
+	var booking model.ReadBooking
+	if err := r.db.Preload("User").Preload("Timeslot", func(db *gorm.DB) *gorm.DB {
+		return db.Table("timeslots")
+	}).Table("bookings").First(&booking, id).Error; err != nil {
 		return nil, err
 	}
 	return &booking, nil

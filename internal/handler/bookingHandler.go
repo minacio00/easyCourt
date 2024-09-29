@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/minacio00/easyCourt/internal/model"
 	"github.com/minacio00/easyCourt/internal/service"
 )
@@ -56,16 +57,18 @@ func (h *BookingHandler) CreateBooking(w http.ResponseWriter, r *http.Request) {
 // @Failure      500 {string} string "Internal server error"
 // @Router       /bookings/{id} [get]
 func (h *BookingHandler) GetBookingByID(w http.ResponseWriter, r *http.Request) {
-	idParam := r.URL.Query().Get("id")
+	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "Invalid ID parameter", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
 	booking, err := h.service.GetBookingByID(id)
 	if err != nil {
-		http.Error(w, "Booking not found", http.StatusNotFound)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
@@ -127,29 +130,32 @@ func (h *BookingHandler) GetAllBookings(w http.ResponseWriter, r *http.Request) 
 // @Accept       json
 // @Produce      json
 // @Param        id path int true "Booking ID"
-// @Param        booking body model.Booking true "Booking Data"
+// @Param        booking body model.CreateBooking true "Booking Data"
 // @Success      200 {object} model.Booking
 // @Failure      400 {string} string "Invalid request payload"
 // @Failure      404 {string} string "Booking not found"
 // @Failure      500 {string} string "Internal server error"
 // @Router       /bookings/{id} [put]
 func (h *BookingHandler) UpdateBooking(w http.ResponseWriter, r *http.Request) {
-	idParam := r.URL.Query().Get("id")
+	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "Invalid ID parameter", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
 	var booking model.Booking
 	if err := json.NewDecoder(r.Body).Decode(&booking); err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
 	booking.ID = id
 	if err := h.service.UpdateBooking(&booking); err != nil {
-		http.Error(w, "Booking not found", http.StatusNotFound)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
