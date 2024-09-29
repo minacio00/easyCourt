@@ -176,7 +176,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Booking"
+                            "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.CreateBooking"
                         }
                     }
                 ],
