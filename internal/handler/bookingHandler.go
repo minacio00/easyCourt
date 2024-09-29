@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/minacio00/easyCourt/internal/model"
 	"github.com/minacio00/easyCourt/internal/service"
 )
@@ -56,17 +57,18 @@ func (h *BookingHandler) CreateBooking(w http.ResponseWriter, r *http.Request) {
 // @Failure      500 {string} string "Internal server error"
 // @Router       /bookings/{id} [get]
 func (h *BookingHandler) GetBookingByID(w http.ResponseWriter, r *http.Request) {
-	idParam := r.URL.Query().Get("id")
+	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "Invalid ID parameter", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
 	booking, err := h.service.GetBookingByID(id)
 	if err != nil {
-		http.Error(w, "Booking not found", http.StatusNotFound)
-		return
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 	}
 
 	w.Header().Set("Content-Type", "application/json")
