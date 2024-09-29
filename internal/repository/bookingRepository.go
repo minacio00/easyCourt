@@ -11,7 +11,7 @@ import (
 type BookingRepository interface {
 	CreateBooking(booking *model.Booking) error
 	GetBookingByID(id int) (*model.Booking, error)
-	GetAllBookings(limit, offset int) ([]model.Booking, error)
+	GetAllBookings(limit, offset int) (*[]model.ReadBooking, error)
 	UpdateBooking(booking *model.Booking) error
 	DeleteBooking(id int) error
 	CheckTimeslotAvailability(booking *model.Booking) error
@@ -76,16 +76,26 @@ func (r *bookingRepository) GetBookingByID(id int) (*model.Booking, error) {
 	return &booking, nil
 }
 
-func (r *bookingRepository) GetAllBookings(limit, offset int) ([]model.Booking, error) {
-	var bookings []model.Booking
-	if err := r.db.Preload("User").Preload("Timeslot").
-		Limit(limit).
-		Offset(offset).
-		Find(&bookings).
-		Error; err != nil {
+func (r *bookingRepository) GetAllBookings(limit, offset int) (*[]model.ReadBooking, error) {
+	var bookings []model.ReadBooking
+	// var bookings []map[string]interface{}
+	query := r.db.
+		Preload("User").
+		Preload("Timeslot", func(db *gorm.DB) *gorm.DB {
+			return db.Table("timeslots")
+		}).
+		Table("bookings")
+
+	if limit > 0 {
+		query = query.Limit(limit)
+	}
+	if offset > 0 {
+		query = query.Offset(offset)
+	}
+	if err := query.Find(&bookings).Error; err != nil {
 		return nil, err
 	}
-	return bookings, nil
+	return &bookings, nil
 }
 
 func (r *bookingRepository) UpdateBooking(booking *model.Booking) error {
