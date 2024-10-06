@@ -2,7 +2,9 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"sync"
+	"time"
 
 	"github.com/minacio00/easyCourt/internal/model"
 	"github.com/minacio00/easyCourt/internal/repository"
@@ -65,6 +67,7 @@ func (s *bookingService) GetAllBookings(limit, offeset int) (*[]model.ReadBookin
 
 func (s *bookingService) UpdateBooking(booking *model.Booking) error {
 	// Update the booking
+	booking.BookingDate = time.Now()
 	if err := s.repo.UpdateBooking(booking); err != nil {
 		return err
 	}
@@ -72,7 +75,8 @@ func (s *bookingService) UpdateBooking(booking *model.Booking) error {
 	// Clear the old timeslot association
 	oldTs, err := s.timeslot_repo.GetTimeslotByBookingId(uint(booking.ID))
 	if err != nil {
-		return err
+		s := fmt.Sprintf("no timeslot found with booking id %v", booking.ID)
+		return errors.New(s)
 	}
 	if oldTs != nil {
 		oldTs.Booking_id = nil
