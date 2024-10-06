@@ -7,12 +7,13 @@ import (
 
 type TimeslotRepository interface {
 	CreateTimeslot(timeslot *model.Timeslot) error
-	GetTimeslotByID(id int) (*model.Timeslot, error)
+	GetTimeslotByID(id int) (*model.ReadTimeslot, error)
 	GetAllTimeslots() ([]model.ReadTimeslot, error)
 	UpdateTimeslot(timeslot *model.Timeslot) error
 	DeleteTimeslot(id int) error
 	GetActiveTimeslots() ([]model.Timeslot, error)
 	GetTimeslotsByCourt(courtID int, weekDay string) ([]model.ReadTimeslot, error)
+	GetTimeslotByBookingId(bookingId uint) (*model.ReadTimeslot, error)
 }
 
 type timeslotRepository struct {
@@ -21,6 +22,15 @@ type timeslotRepository struct {
 
 func NewTimeslotRepository(db *gorm.DB) TimeslotRepository {
 	return &timeslotRepository{db}
+}
+
+func (r *timeslotRepository) GetTimeslotByBookingId(bookingId uint) (*model.ReadTimeslot, error) {
+	var timeslot *model.ReadTimeslot
+	err := r.db.Model(&model.Timeslot{}).Preload("Court").Where("booking_id = ?", bookingId).First(&timeslot).Error
+	if err != nil {
+		return nil, err
+	}
+	return timeslot, nil
 }
 
 func (r *timeslotRepository) GetTimeslotsByCourt(courtID int, weekDay string) ([]model.ReadTimeslot, error) {
@@ -47,16 +57,16 @@ func (r *timeslotRepository) CreateTimeslot(timeslot *model.Timeslot) error {
 	return r.db.Create(timeslot).Error
 }
 
-func (r *timeslotRepository) GetTimeslotByID(id int) (*model.Timeslot, error) {
-	var timeslot model.ReadTimeslot
+func (r *timeslotRepository) GetTimeslotByID(id int) (*model.ReadTimeslot, error) {
+	var timeslot *model.ReadTimeslot
 	if err := r.db.Model(&model.Timeslot{}).Preload("Court").First(&timeslot, id).Error; err != nil {
 		return nil, err
 	}
-	s, err := timeslot.ToTimeslot()
-	if err != nil {
-		return nil, err
-	}
-	return s, nil
+	// s, err := timeslot.ToTimeslot()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	return timeslot, nil
 }
 func (r *timeslotRepository) GetAllTimeslots() ([]model.ReadTimeslot, error) {
 	var timeslots []model.ReadTimeslot
@@ -73,6 +83,7 @@ func (r *timeslotRepository) UpdateTimeslot(timeslot *model.Timeslot) error {
 		"start_time": timeslot.StartTime,
 		"end_time":   timeslot.EndTime,
 		"is_active":  timeslot.IsActive,
+		"booking_id": timeslot.Booking_id,
 	}).Error
 }
 

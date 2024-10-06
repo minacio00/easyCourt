@@ -102,12 +102,13 @@ func (rt *ReadTimeslot) ToTimeslot() (*Timeslot, error) {
 	}
 
 	return &Timeslot{
-		ID:        rt.ID,
-		CourtID:   rt.CourtID,
-		Court:     rt.Court,
-		Day:       rt.Day,
-		StartTime: startTime,
-		EndTime:   endTime,
-		IsActive:  rt.IsActive,
+		ID:         rt.ID,
+		CourtID:    rt.CourtID,
+		Court:      rt.Court,
+		Day:        rt.Day,
+		StartTime:  startTime,
+		EndTime:    endTime,
+		IsActive:   rt.IsActive,
+		Booking_id: rt.Booking_id,
 	}, nil
 }

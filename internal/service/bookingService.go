@@ -26,12 +26,13 @@ type BookingService interface {
 }
 
 type bookingService struct {
-	repo      repository.BookingRepository
-	user_repo repository.UserRepository
+	repo          repository.BookingRepository
+	user_repo     repository.UserRepository
+	timeslot_repo repository.TimeslotRepository
 }
 
-func NewBookingService(repo repository.BookingRepository, user repository.UserRepository) BookingService {
-	return &bookingService{repo, user}
+func NewBookingService(repo repository.BookingRepository, user repository.UserRepository, timeslot repository.TimeslotRepository) BookingService {
+	return &bookingService{repo, user, timeslot}
 }
 
 func (s *bookingService) CreateBooking(booking *model.Booking) error {
@@ -63,11 +64,51 @@ func (s *bookingService) GetAllBookings(limit, offeset int) (*[]model.ReadBookin
 }
 
 func (s *bookingService) UpdateBooking(booking *model.Booking) error {
-	// Add any additional logic before updating a booking, if necessary
-	return s.repo.UpdateBooking(booking)
+	// Update the booking
+	if err := s.repo.UpdateBooking(booking); err != nil {
+		return err
+	}
+
+	// Clear the old timeslot association
+	oldTs, err := s.timeslot_repo.GetTimeslotByBookingId(uint(booking.ID))
+	if err != nil {
+		return err
+	}
+	if oldTs != nil {
+		oldTs.Booking_id = nil
+		oldTimeslot, err := oldTs.ToTimeslot()
+		if err != nil {
+			return err
+		}
+		if err = s.timeslot_repo.UpdateTimeslot(oldTimeslot); err != nil {
+			return err
+		}
+	}
+
+	// Set the new timeslot association
+	newTs, err := s.timeslot_repo.GetTimeslotByID(booking.TimeslotID)
+	if err != nil {
+		return err
+	}
+	if newTs != nil && newTs.Booking_id != nil {
+		*newTs.Booking_id = booking.ID
+		newTimeslot, err := newTs.ToTimeslot()
+		if err != nil {
+			return err
+		}
+		if err = s.timeslot_repo.UpdateTimeslot(newTimeslot); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (s *bookingService) DeleteBooking(id int) error {
-	// Add any additional logic before deleting a booking, if necessary
-	return s.repo.DeleteBooking(id)
+	err := s.repo.DeleteBooking(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

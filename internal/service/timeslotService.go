@@ -10,7 +10,7 @@ import (
 
 type TimeslotService interface {
 	CreateTimeslot(timeslot *model.Timeslot) error
-	GetTimeslotByID(id int) (*model.Timeslot, error)
+	GetTimeslotByID(id int) (*model.ReadTimeslot, error)
 	GetAllTimeslots() ([]model.ReadTimeslot, error)
 	UpdateTimeslot(timeslot *model.Timeslot) error
 	DeleteTimeslot(id int) error
@@ -55,7 +55,7 @@ func (s *timeslotService) CreateTimeslot(timeslot *model.Timeslot) error {
 	return s.repo.CreateTimeslot(timeslot)
 }
 
-func (s *timeslotService) GetTimeslotByID(id int) (*model.Timeslot, error) {
+func (s *timeslotService) GetTimeslotByID(id int) (*model.ReadTimeslot, error) {
 	return s.repo.GetTimeslotByID(id)
 }
 
@@ -87,15 +87,19 @@ func (s *timeslotService) UpdateTimeslot(timeslot *model.Timeslot) error {
 	if err != nil {
 		return fmt.Errorf("timeslot with id %d does not exist: %w", timeslot.ID, err)
 	}
+	ts, err := existingTimeslot.ToTimeslot()
+	if err != nil {
+		return err
+	}
 
 	// Update only the fields that are allowed to be updated
-	existingTimeslot.CourtID = timeslot.CourtID
-	existingTimeslot.Day = timeslot.Day
-	existingTimeslot.StartTime = timeslot.StartTime
-	existingTimeslot.EndTime = timeslot.EndTime
-	existingTimeslot.IsActive = timeslot.IsActive
+	ts.CourtID = timeslot.CourtID
+	ts.Day = timeslot.Day
+	ts.StartTime = timeslot.StartTime
+	ts.EndTime = timeslot.EndTime
+	ts.IsActive = timeslot.IsActive
 
-	return s.repo.UpdateTimeslot(existingTimeslot)
+	return s.repo.UpdateTimeslot(ts)
 }
 
 func (s *timeslotService) DeleteTimeslot(id int) error {
