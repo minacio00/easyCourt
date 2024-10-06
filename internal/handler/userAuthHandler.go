@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	_ "github.com/minacio00/easyCourt/internal/model"
 	"github.com/minacio00/easyCourt/internal/service"
@@ -90,5 +92,66 @@ func (h *UserAuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"access_token":  newAccessToken,
 		"refresh_token": newRefreshToken,
+	})
+}
+func (h *UserAuthHandler) Authenticate(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{
+				"error": "Authorization header is required",
+			})
+			return
+		}
+		bearerToken := strings.Split(authHeader, " ")
+		if len(bearerToken) != 2 {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{
+				"error": "Invalid authorization header format",
+			})
+			return
+		}
+		token := bearerToken[1]
+		userID, err := h.service.ValidateAccessToken(token)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), "user_id", userID)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func (h *UserAuthHandler) RequireAdmin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID, ok := r.Context().Value("user_id").(uint)
+		if !ok {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{
+				"error": "User ID not found in context",
+			})
+			return
+		}
+		isAdmin, err := h.service.IsUserAdmin(userID)
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{
+				"error": err.Error(),
+			})
+			return
+		}
+		if !isAdmin {
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(map[string]string{
+				"error": "Usuário sem permissão para acessar essa página",
+			})
+			return
+		}
+		next.ServeHTTP(w, r)
 	})
 }

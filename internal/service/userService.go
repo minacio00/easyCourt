@@ -19,6 +19,8 @@ type UserService interface {
 	DeleteUser(id uint) error
 	Authenticate(phone, password string) (*model.User, string, string, error)
 	RefreshToken(refreshToken string) (string, string, error)
+	ValidateAccessToken(tokenstr string) (uint, error)
+	IsUserAdmin(userID uint) (bool, error)
 }
 
 type userService struct {
@@ -31,14 +33,52 @@ func NewUserService(repo repository.UserRepository) UserService {
 	return &userService{repo, []byte(secret)}
 }
 
+func (s *userService) ValidateAccessToken(tokenstr string) (uint, error) {
+	token, err := jwt.Parse(tokenstr, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unexpected signin method")
+		}
+		return s.jwtSecret, nil
+	})
+	if err != nil {
+		return 0, err
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		if claims["type"] != "access" {
+			return 0, errors.New("invalid token type")
+		}
+		if exp, ok := claims["exp"].(float64); ok {
+			if time.Now().Unix() > int64(exp) {
+				return 0, errors.New("token expired")
+			}
+		} else {
+			return 0, errors.New("invalid expiration claim")
+		}
+		if userID, ok := claims["user_id"].(float64); ok {
+			return uint(userID), nil
+		}
+		return 0, errors.New("invalid user_id claim")
+	}
+	return 0, errors.New("invalid token")
+}
+func (s *userService) IsUserAdmin(userID uint) (bool, error) {
+	user, err := s.GetUserByID(userID)
+	if err != nil {
+		return false, err
+	}
+	return user.IsAdmin, nil
+}
 func (s *userService) CreateUser(user *model.User) error {
+	if err := user.Validate(); err != nil {
+		return err
+	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 	usr, _ := s.repo.GetUserByPhone(user.Phone)
 	if usr != nil {
-		return errors.New("phone already in use")
+		return errors.New("telefone já está sendo utilizado")
 	}
 	user.Password = string(hashedPassword)
 	return s.repo.CreateUser(user)
