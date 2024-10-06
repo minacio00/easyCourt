@@ -51,51 +51,73 @@ func NewRouter() http.Handler {
 	r.Route("/api/v1", func(r chi.Router) {
 
 		r.Route("/timeslots", func(r chi.Router) {
-			r.Put("/{id}", timeslotHandler.UpdateTimeslot)
-			r.Post("/", timeslotHandler.CreateTimeslot)
 			r.Get("/{id}", timeslotHandler.GetTimeslotByID)
-			r.Delete("/{id}", timeslotHandler.DeleteTimeslot)
 			r.Get("/by-court", timeslotHandler.GetTimeslotsByCourt)
 			r.Get("/", timeslotHandler.GetAllTimeslots)
+			r.Group(func(r chi.Router) {
+				r.Use(userAuthHandler.Authenticate)
+				r.Use(userAuthHandler.RequireAdmin)
+				r.Put("/{id}", timeslotHandler.UpdateTimeslot)
+				r.Post("/", timeslotHandler.CreateTimeslot)
+				r.Delete("/{id}", timeslotHandler.DeleteTimeslot)
+			})
 		})
 
+		// Bookings
 		r.Route("/bookings", func(r chi.Router) {
-			r.Post("/", bookingHandler.CreateBooking)
-			r.Put("/{id}", bookingHandler.UpdateBooking)
-			r.Delete("/{id}", bookingHandler.DeleteBooking)
 			r.Get("/{id}", bookingHandler.GetBookingByID)
 			r.Get("/", bookingHandler.GetAllBookings)
+			r.Group(func(r chi.Router) {
+				r.Use(userAuthHandler.Authenticate)
+				r.Post("/", bookingHandler.CreateBooking)
+				r.Put("/{id}", bookingHandler.UpdateBooking)
+				r.Delete("/{id}", bookingHandler.DeleteBooking)
+			})
 		})
 
 		// Location routes
 		r.Route("/location", func(r chi.Router) {
-			r.Post("/", locationHandler.CreateLocation)
 			r.Get("/", locationHandler.GetAllLocations)
-			r.Put("/", locationHandler.UpdateLocation)
-			r.Delete("/{id}", locationHandler.DeleteLocation)
-			r.Post("/{id}/image", locationHandler.UploadLocationImage)
+			r.Group(func(r chi.Router) {
+				r.Use(userAuthHandler.Authenticate)
+				r.Use(userAuthHandler.RequireAdmin)
+				r.Post("/", locationHandler.CreateLocation)
+				r.Put("/", locationHandler.UpdateLocation)
+				r.Delete("/{id}", locationHandler.DeleteLocation)
+				r.Post("/{id}/image", locationHandler.UploadLocationImage)
+			})
 		})
 
 		// User routes
 		r.Route("/users", func(r chi.Router) {
-			r.Post("/", userHandler.CreateUser)
-			r.Get("/{id}", userHandler.GetUserByID)
-			r.Get("/", userHandler.GetAllUsers)
-			r.Put("/", userHandler.UpdateUser)
-			r.Delete("/{id}", userHandler.DeleteUser)
+			r.Post("/", userHandler.CreateUser) // Keep this public for user registration
+			r.Group(func(r chi.Router) {
+				r.Use(userAuthHandler.Authenticate)
+				r.Get("/{id}", userHandler.GetUserByID)
+				r.Group(func(r chi.Router) {
+					r.Use(userAuthHandler.RequireAdmin)
+					r.Get("/", userHandler.GetAllUsers)
+					r.Put("/", userHandler.UpdateUser)
+					r.Delete("/{id}", userHandler.DeleteUser)
+				})
+			})
 		})
 
 		// Court routes
 		r.Route("/courts", func(r chi.Router) {
-			r.Post("/", courtHandler.CreateCourt)
 			r.Get("/by-location", courtHandler.GetCourtByLocation)
-			r.Get("/", courtHandler.GetAllCourts)
 			r.Get("/{id}", courtHandler.GetCourtByID)
-			r.Put("/", courtHandler.UpdateCourt)
-			r.Delete("/{id}", courtHandler.DeleteCourt)
+			r.Get("/", courtHandler.GetAllCourts)
+			r.Group(func(r chi.Router) {
+				r.Use(userAuthHandler.Authenticate)
+				r.Use(userAuthHandler.RequireAdmin)
+				r.Post("/", courtHandler.CreateCourt)
+				r.Put("/", courtHandler.UpdateCourt)
+				r.Delete("/{id}", courtHandler.DeleteCourt)
+			})
 		})
 
-		// Authentication route
+		// Authentication routes
 		r.Post("/login", userAuthHandler.Login)
 		r.Post("/refresh", userAuthHandler.Refresh)
 	})
