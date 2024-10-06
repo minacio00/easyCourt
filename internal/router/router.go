@@ -36,7 +36,7 @@ func NewRouter() http.Handler {
 	userService := service.NewUserService(userRepo)
 	locationService := service.NewLocationService(locationRepo)
 	courtService := service.NewCourtService(courtRepo)
-	bookingsService := service.NewBookingService(bookingsRepo, userRepo)
+	bookingsService := service.NewBookingService(bookingsRepo, userRepo, timeslotRepo)
 	timeslotService := service.NewTimeslotService(timeslotRepo, courtRepo)
 
 	// Set up handlers
@@ -61,8 +61,8 @@ func NewRouter() http.Handler {
 
 		r.Route("/bookings", func(r chi.Router) {
 			r.Post("/", bookingHandler.CreateBooking)
-			r.Put("/", bookingHandler.UpdateBooking)
-			r.Delete("/", bookingHandler.DeleteBooking)
+			r.Put("/{id}", bookingHandler.UpdateBooking)
+			r.Delete("/{id}", bookingHandler.DeleteBooking)
 			r.Get("/{id}", bookingHandler.GetBookingByID)
 			r.Get("/", bookingHandler.GetAllBookings)
 		})

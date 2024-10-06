@@ -93,7 +93,7 @@ func (h *BookingHandler) GetAllBookings(w http.ResponseWriter, r *http.Request) 
 	offsetParam := r.URL.Query().Get("offset")
 
 	// Default values for pagination if not provided
-	limit := 10
+	limit := 0
 	offset := 0
 
 	// Parse limit and offset if provided
@@ -175,15 +175,16 @@ func (h *BookingHandler) UpdateBooking(w http.ResponseWriter, r *http.Request) {
 // @Failure      500 {string} string "Internal server error"
 // @Router       /bookings/{id} [delete]
 func (h *BookingHandler) DeleteBooking(w http.ResponseWriter, r *http.Request) {
-	idParam := r.URL.Query().Get("id")
+	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "Invalid ID parameter", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
 	if err := h.service.DeleteBooking(id); err != nil {
-		http.Error(w, "Booking not found", http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
