@@ -25,7 +25,7 @@ type Timeslot struct {
 	StartTime  time.Time `json:"start_time" gorm:"type:time"`
 	EndTime    time.Time `json:"end_time" gorm:"type:time"`
 	IsActive   bool      `json:"is_active" gorm:"default:true"`
-	Booking    *Booking  `json:"booking,omitempty"`
+	Booking    *Booking  `gorm:"foreignKey:Booking_id" json:"booking,omitempty"`
 	Booking_id *int      `json:"booking_id"`
 }
 

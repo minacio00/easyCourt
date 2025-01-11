@@ -6,15 +6,15 @@ import (
 )
 
 type Booking struct {
-	ID              int       `gorm:"primaryKey" json:"-"`
+	ID              int       `gorm:"primaryKey"`
 	UserID          int       `json:"user_id" gorm:"foreignKey:UserID"` // Foreign key to User
 	User            User      `json:"user"`
 	Opponent        string    `json:"opponent_name"`
 	Partner         *string   `json:"partner_name"`
 	OpponentPartner *string   `json:"opponent_partner"`
-	TimeslotID      int       `json:"timeslot_id"`                    // Foreign key to Timeslot
-	Timeslot        Timeslot  `gorm:"foreignKey:TimeslotID" json:"-"` // Relationship with Timeslot
-	BookingDate     time.Time `json:"booking_date"`                   // Date of the booking
+	TimeslotID      int       `json:"timeslot_id"`  // Foreign key to Timeslot
+	Timeslot        Timeslot  `json:"-"`            // Relationship with Timeslot
+	BookingDate     time.Time `json:"booking_date"` // Date of the booking
 	IsSinglesGame   bool      `json:"singles_flag"`
 }
 
