@@ -53,8 +53,7 @@ func (r *timeslotRepository) GetTimeslotsByCourt(courtID int, weekDay string) ([
 
 }
 func (r *timeslotRepository) CreateTimeslot(timeslot *model.Timeslot) error {
-	println(&timeslot.CourtID)
-	return r.db.Create(timeslot).Error
+	return r.db.Select("court_id", "day", "start_time", "end_time", "is_active").Create(timeslot).Error
 }
 
 func (r *timeslotRepository) GetTimeslotByID(id int) (*model.ReadTimeslot, error) {
