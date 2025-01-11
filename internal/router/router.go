@@ -90,7 +90,7 @@ func NewRouter() http.Handler {
 
 		// User routes
 		r.Route("/users", func(r chi.Router) {
-			r.Post("/", userHandler.CreateUser) // Keep this public for user registration
+			r.Post("/", userHandler.CreateUser)
 			r.Group(func(r chi.Router) {
 				r.Use(userAuthHandler.Authenticate)
 				r.Get("/{id}", userHandler.GetUserByID)

@@ -59,7 +59,7 @@ func (r *timeslotRepository) CreateTimeslot(timeslot *model.Timeslot) error {
 
 func (r *timeslotRepository) GetTimeslotByID(id int) (*model.ReadTimeslot, error) {
 	var timeslot *model.ReadTimeslot
-	if err := r.db.Model(&model.Timeslot{}).Preload("Court").First(&timeslot, id).Error; err != nil {
+	if err := r.db.Model(&model.Timeslot{}).Preload("Court").Preload("Booking.User").First(&timeslot, id).Error; err != nil {
 		return nil, err
 	}
 	// s, err := timeslot.ToTimeslot()
@@ -70,7 +70,7 @@ func (r *timeslotRepository) GetTimeslotByID(id int) (*model.ReadTimeslot, error
 }
 func (r *timeslotRepository) GetAllTimeslots() ([]model.ReadTimeslot, error) {
 	var timeslots []model.ReadTimeslot
-	if err := r.db.Preload("Court").Model(&model.Timeslot{}).Find(&timeslots).Error; err != nil {
+	if err := r.db.Preload("Court").Preload("Booking.User").Model(&model.Timeslot{}).Find(&timeslots).Error; err != nil {
 		return nil, err
 	}
 	return timeslots, nil
