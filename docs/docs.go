@@ -105,9 +105,11 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/bookings/reset": {
             "delete": {
-                "description": "Deletes a booking by its ID",
+                "description": "Delete all the bookings",
                 "consumes": [
                     "application/json"
                 ],
@@ -117,31 +119,10 @@ const docTemplate = `{
                 "tags": [
                     "bookings"
                 ],
-                "summary": "Delete a booking",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Booking ID",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
+                "summary": "Delete all the bookings",
                 "responses": {
-                    "204": {
-                        "description": "No Content",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid ID parameter",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Booking not found",
+                    "200": {
+                        "description": "ok",
                         "schema": {
                             "type": "string"
                         }
@@ -237,6 +218,48 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Invalid request payload",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Booking not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a booking by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "Delete a booking",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Booking ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
                         "schema": {
                             "type": "string"
                         }
@@ -1273,6 +1296,9 @@ const docTemplate = `{
                 "booking_date": {
                     "description": "Date of the booking",
                     "type": "string"
+                },
+                "id": {
+                    "type": "integer"
                 },
                 "opponent_name": {
                     "type": "string"

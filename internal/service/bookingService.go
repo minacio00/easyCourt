@@ -25,6 +25,7 @@ type BookingService interface {
 	GetAllBookings(limit, offeset int) (*[]model.ReadBooking, error)
 	UpdateBooking(booking *model.Booking) error
 	DeleteBooking(id int) error
+	ResetBookings() error
 }
 
 type bookingService struct {
@@ -115,4 +116,8 @@ func (s *bookingService) DeleteBooking(id int) error {
 	}
 
 	return nil
+}
+
+func (s *bookingService) ResetBookings() error {
+	return s.repo.ResetBookings()
 }
