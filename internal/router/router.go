@@ -73,6 +73,11 @@ func NewRouter() http.Handler {
 				r.Put("/{id}", bookingHandler.UpdateBooking)
 				r.Delete("/{id}", bookingHandler.DeleteBooking)
 			})
+			r.Group(func(r chi.Router) {
+				r.Use(userAuthHandler.Authenticate)
+				r.Use(userAuthHandler.RequireAdmin)
+				r.Delete("/", bookingHandler.ResetBookings)
+			})
 		})
 
 		// Location routes

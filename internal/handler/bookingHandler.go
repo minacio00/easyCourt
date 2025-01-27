@@ -190,3 +190,22 @@ func (h *BookingHandler) DeleteBooking(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// ResetBookings godoc
+// @Summary      Delete all the bookings
+// @Description  Delete all the bookings
+// @Tags         bookings
+// @Accept       json
+// @Produce      json
+// @Success      200 {string} success "ok"
+// @Failure      500 {string} string "Internal server error"
+// @Router       /bookings/reset [delete]
+func (h *BookingHandler) ResetBookings(w http.ResponseWriter, r *http.Request) {
+	errMap := make(map[string]string)
+	if err := h.service.ResetBookings(); err != nil {
+		errMap["error"] = err.Error()
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(errMap)
+		return
+	}
+}

@@ -12,6 +12,8 @@ definitions:
       booking_date:
         description: Date of the booking
         type: string
+      id:
+        type: integer
       opponent_name:
         type: string
       opponent_partner:
@@ -218,38 +220,6 @@ info:
   version: "1.0"
 paths:
   /bookings:
-    delete:
-      consumes:
-      - application/json
-      description: Deletes a booking by its ID
-      parameters:
-      - description: Booking ID
-        in: query
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-          schema:
-            type: string
-        "400":
-          description: Invalid ID parameter
-          schema:
-            type: string
-        "404":
-          description: Booking not found
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      summary: Delete a booking
-      tags:
-      - bookings
     get:
       consumes:
       - application/json
@@ -311,6 +281,34 @@ paths:
       tags:
       - bookings
   /bookings/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a booking by its ID
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "404":
+          description: Booking not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete a booking
+      tags:
+      - bookings
     get:
       consumes:
       - application/json
@@ -375,6 +373,25 @@ paths:
           schema:
             type: string
       summary: Update a booking
+      tags:
+      - bookings
+  /bookings/reset:
+    delete:
+      consumes:
+      - application/json
+      description: Delete all the bookings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete all the bookings
       tags:
       - bookings
   /courts:

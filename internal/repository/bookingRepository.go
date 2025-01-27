@@ -15,6 +15,7 @@ type BookingRepository interface {
 	UpdateBooking(booking *model.Booking) error
 	DeleteBooking(id int) error
 	CheckTimeslotAvailability(booking *model.Booking) error
+	ResetBookings() error
 }
 
 type bookingRepository struct {
@@ -106,4 +107,8 @@ func (r *bookingRepository) UpdateBooking(booking *model.Booking) error {
 
 func (r *bookingRepository) DeleteBooking(id int) error {
 	return r.db.Delete(&model.Booking{}, id).Error
+}
+
+func (r *bookingRepository) ResetBookings() error {
+	return r.db.Delete(&model.Booking{}, "1 = 1").Error
 }
