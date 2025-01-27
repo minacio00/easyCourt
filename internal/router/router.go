@@ -76,7 +76,7 @@ func NewRouter() http.Handler {
 			r.Group(func(r chi.Router) {
 				r.Use(userAuthHandler.Authenticate)
 				r.Use(userAuthHandler.RequireAdmin)
-				r.Delete("/", bookingHandler.ResetBookings)
+				r.Delete("/reset", bookingHandler.ResetBookings)
 			})
 		})
 
