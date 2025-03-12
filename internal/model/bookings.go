@@ -12,8 +12,7 @@ type Booking struct {
 	Opponent        string    `json:"opponent_name"`
 	Partner         *string   `json:"partner_name"`
 	OpponentPartner *string   `json:"opponent_partner"`
-	TimeslotID      int       `json:"timeslot_id"`  // Foreign key to Timeslot
-	Timeslot        Timeslot  `json:"-"`            // Relationship with Timeslot
+	TimeslotID      int       `json:"timeslot_id"`
 	BookingDate     time.Time `json:"booking_date"` // Date of the booking
 	IsSinglesGame   bool      `json:"singles_flag"`
 }
