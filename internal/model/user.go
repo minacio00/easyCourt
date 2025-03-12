@@ -15,6 +15,7 @@ type User struct {
 	IsAdmin   bool      `json:"isAdmin"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
+	Bookings  []Booking `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;" json:"-"`
 }
 
 func (u *User) Validate() error {
