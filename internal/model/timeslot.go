@@ -83,10 +83,10 @@ type ReadTimeslot struct {
 	CourtID   *int         `json:"court_id"`
 	Court     Court        `json:"court"`
 	Day       Weekday      `json:"week_day"`
-	StartTime string       `json:"start_time"`
-	EndTime   string       `json:"end_time"`
+	StartTime string       `json:"start_time" gorm:"column:start_time"`
+	EndTime   string       `json:"end_time" gorm:"column:end_time"`
 	IsActive  bool         `json:"is_active"`
-	Booking   *ReadBooking `json:"booking,omitempty"`
+	Booking   *ReadBooking `json:"booking,omitempty" gorm:"-"`
 }
 
 func (rt *ReadTimeslot) ToTimeslot() (*Timeslot, error) {
