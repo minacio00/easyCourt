@@ -39,7 +39,13 @@ func (r *timeslotRepository) GetTimeslotsByCourt(courtID int, weekDay string) ([
 	// First fetch all timeslots matching the criteria
 	var timeslots []model.ReadTimeslot
 	query := r.db.Table("timeslots").
-		Select("timeslots.*, courts.*").
+		Select(`
+	timeslots.*, 
+    courts.id AS court_id,
+    courts.name,
+    courts.created_at,
+    courts.updated_at
+`).
 		Joins("LEFT JOIN courts ON timeslots.court_id = courts.id").
 		Where("timeslots.court_id = ?", courtID)
 
