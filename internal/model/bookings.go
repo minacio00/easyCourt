@@ -7,7 +7,7 @@ import (
 
 type Booking struct {
 	ID              int       `gorm:"primaryKey"`
-	UserID          int       `json:"user_id" gorm:"foreignKey:UserID"` // Foreign key to User
+	UserID          int       `json:"user_id" gorm:"index"`
 	User            User      `json:"user"`
 	Opponent        string    `json:"opponent_name"`
 	Partner         *string   `json:"partner_name"`
