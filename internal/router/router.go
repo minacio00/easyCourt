@@ -129,7 +129,7 @@ func NewRouter() http.Handler {
 
 	// Swagger documentation
 	r.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("/docs/swagger.json"), // Matches the expected URL
+		httpSwagger.URL("/docs/swagger.json"),
 	))
 	r.Handle("/docs/*", http.StripPrefix("/docs", http.FileServer(http.Dir("./docs"))))
 

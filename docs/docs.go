@@ -1422,6 +1422,9 @@ const docTemplate = `{
         "github_com_minacio00_easyCourt_internal_model.Location": {
             "type": "object",
             "properties": {
+                "allowAppPayments": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -1429,6 +1432,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "location_name": {
+                    "type": "string"
+                },
+                "paymentDescription": {
+                    "type": "string"
+                },
+                "pix": {
                     "type": "string"
                 }
             }
