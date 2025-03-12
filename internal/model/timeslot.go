@@ -79,8 +79,8 @@ func (c *CreateTimeslot) ConvertCreateTimeslotToTimeslot() (*Timeslot, error) {
 }
 
 type ReadTimeslot struct {
-	ID        int          `json:"id"`
-	CourtID   *int         `json:"court_id"`
+	ID        int          `json:"id" gorm:"timeslot_id"`
+	CourtID   *int         `json:"court_id" gorm:"column:court_id"`
 	Court     Court        `json:"court"`
 	Day       Weekday      `json:"week_day"`
 	StartTime string       `json:"start_time" gorm:"column:start_time"`
