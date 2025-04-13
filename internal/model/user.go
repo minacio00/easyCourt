@@ -10,6 +10,8 @@ import (
 type User struct {
 	ID        uint      `gorm:"primaryKey" json:"id"`
 	Name      string    `json:"name"`
+	LastName  string    `json:"lastName"`
+	Email     string    `json:"email"`
 	Phone     string    `json:"phone"`
 	Password  string    `json:"-"`
 	IsAdmin   bool      `json:"isAdmin"`
