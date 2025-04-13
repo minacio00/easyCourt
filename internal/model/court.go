@@ -10,7 +10,7 @@ type Court struct {
 	gorm.Model
 	Name       string    `json:"name" gorm:"not null"`
 	LocationID int       `json:"location_id"`
-	Location   *Location `json:"location,omitempty" gorm:"foreignKey:LocationID"`
+	Location   *Location `json:"location,omitempty" gorm:"foreignKey:LocationID;constraint:OnDelete:CASCADE"`
 }
 
 func (c *Court) Validate() error {

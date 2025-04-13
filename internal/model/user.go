@@ -10,11 +10,14 @@ import (
 type User struct {
 	ID        uint      `gorm:"primaryKey" json:"id"`
 	Name      string    `json:"name"`
+	LastName  string    `json:"lastName"`
+	Email     string    `json:"email"`
 	Phone     string    `json:"phone"`
 	Password  string    `json:"-"`
 	IsAdmin   bool      `json:"isAdmin"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
+	Bookings  []Booking `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;" json:"-"`
 }
 
 func (u *User) Validate() error {
@@ -71,6 +74,8 @@ type UserResponse struct {
 	ID       uint   `json:"id"`
 	Name     string `json:"name"`
 	Phone    string `json:"phone"`
+	LastName string `json:"lastName"`
+	Email    string `json:"email"`
 	Password string `json:"-"`
 	IsAdmin  bool   `json:"isAdmin"`
 }
@@ -78,6 +83,8 @@ type CreateUser struct {
 	ID       uint   `json:"id"`
 	Name     string `json:"name"`
 	Phone    string `json:"phone"`
+	LastName string `json:"lastName"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 	IsAdmin  bool   `json:"-"`
 }
@@ -89,14 +96,18 @@ func (u *CreateUser) MapCreateToUser() *User {
 		Phone:    u.Phone,
 		IsAdmin:  u.IsAdmin,
 		Password: u.Password,
+		LastName: u.LastName,
+		Email:    u.Email,
 	}
 }
 
 func (u *User) MapUserToResponse() *UserResponse {
 	return &UserResponse{
-		ID:      u.ID,
-		Name:    u.Name,
-		Phone:   u.Phone,
-		IsAdmin: u.IsAdmin,
+		ID:       u.ID,
+		Name:     u.Name,
+		Phone:    u.Phone,
+		IsAdmin:  u.IsAdmin,
+		LastName: u.LastName,
+		Email:    u.Email,
 	}
 }

@@ -8,6 +8,18 @@ import (
 )
 
 func MapWeekDay(day string) (model.Weekday, error) {
+
+	switch model.Weekday(day) {
+	case model.Domingo,
+		model.SegundaFeira,
+		model.TercaFeira,
+		model.QuartaFeira,
+		model.QuintaFeira,
+		model.SextaFeira,
+		model.Sabado:
+		return model.Weekday(day), nil
+	}
+
 	day = strings.ToLower((strings.TrimSpace(day)))
 	day = strings.ReplaceAll(day, "-", "")
 	day = strings.ReplaceAll(day, " ", "")

@@ -45,13 +45,10 @@ func Init() {
 			log.Fatalf("failed to connect to the database: %v", err)
 		}
 		if err := DB.AutoMigrate(
-			&model.User{},
-			&model.Location{},
-			&model.Court{}, &model.Timeslot{}, &model.Booking{},
+			&model.Location{}, &model.Court{},
 		); err != nil {
 			log.Fatalf("AutoMigrate failed: %v", err)
 		}
-
 	})
 }
 

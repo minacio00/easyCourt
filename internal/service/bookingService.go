@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
@@ -22,9 +21,10 @@ func getTimeslotMutex(timeslotID int) *sync.Mutex {
 type BookingService interface {
 	CreateBooking(booking *model.Booking) error
 	GetBookingByID(id int) (*model.ReadBooking, error)
-	GetAllBookings(limit, offeset int) (*[]model.ReadBooking, error)
+	GetAllBookings(limit, offset int) (*[]model.ReadBooking, error)
 	UpdateBooking(booking *model.Booking) error
 	DeleteBooking(id int) error
+	ResetBookings() error
 }
 
 type bookingService struct {
@@ -41,19 +41,32 @@ func (s *bookingService) CreateBooking(booking *model.Booking) error {
 	if err := booking.Validate(); err != nil {
 		return err
 	}
+
 	if err := s.repo.CheckTimeslotAvailability(booking); err != nil {
 		return err
 	}
+
+	// Verify user exists
 	if _, err := s.user_repo.GetUserByID(uint(booking.UserID)); err != nil {
 		return errors.New("user not found")
 	}
 
+	// Verify timeslot exists
+	if _, err := s.timeslot_repo.GetTimeslotByID(booking.TimeslotID); err != nil {
+		return errors.New("timeslot not found")
+	}
+
+	// Use mutex to prevent race conditions
 	mutex := getTimeslotMutex(booking.TimeslotID)
 	if !mutex.TryLock() {
 		mutex.Lock()
 	}
 	defer mutex.Unlock()
 
+	// Set booking date
+	booking.BookingDate = time.Now()
+
+	// Create the booking
 	return s.repo.CreateBooking(booking)
 }
 
@@ -61,58 +74,36 @@ func (s *bookingService) GetBookingByID(id int) (*model.ReadBooking, error) {
 	return s.repo.GetBookingByID(id)
 }
 
-func (s *bookingService) GetAllBookings(limit, offeset int) (*[]model.ReadBooking, error) {
-	return s.repo.GetAllBookings(limit, offeset)
+func (s *bookingService) GetAllBookings(limit, offset int) (*[]model.ReadBooking, error) {
+	return s.repo.GetAllBookings(limit, offset)
 }
 
 func (s *bookingService) UpdateBooking(booking *model.Booking) error {
-	// Update the booking
+	// Update booking date
 	booking.BookingDate = time.Now()
-	if err := s.repo.UpdateBooking(booking); err != nil {
-		return err
-	}
 
-	// Clear the old timeslot association
-	oldTs, err := s.timeslot_repo.GetTimeslotByBookingId(uint(booking.ID))
-	if err != nil {
-		s := fmt.Sprintf("no timeslot found with booking id %v", booking.ID)
-		return errors.New(s)
-	}
-	if oldTs != nil {
-		oldTs.Booking_id = nil
-		oldTimeslot, err := oldTs.ToTimeslot()
-		if err != nil {
-			return err
-		}
-		if err = s.timeslot_repo.UpdateTimeslot(oldTimeslot); err != nil {
-			return err
-		}
-	}
-
-	// Set the new timeslot association
-	newTs, err := s.timeslot_repo.GetTimeslotByID(booking.TimeslotID)
+	// Verify the new timeslot exists and is available
+	// (only if timeslot is changing)
+	oldBooking, err := s.GetBookingByID(booking.ID)
 	if err != nil {
 		return err
 	}
-	if newTs != nil && newTs.Booking_id != nil {
-		*newTs.Booking_id = booking.ID
-		newTimeslot, err := newTs.ToTimeslot()
-		if err != nil {
-			return err
-		}
-		if err = s.timeslot_repo.UpdateTimeslot(newTimeslot); err != nil {
+
+	if oldBooking.TimeslotID != booking.TimeslotID {
+		// Check if the new timeslot is available
+		if err := s.repo.CheckTimeslotAvailability(booking); err != nil {
 			return err
 		}
 	}
 
-	return nil
+	// Update the booking
+	return s.repo.UpdateBooking(booking)
 }
 
 func (s *bookingService) DeleteBooking(id int) error {
-	err := s.repo.DeleteBooking(id)
-	if err != nil {
-		return err
-	}
+	return s.repo.DeleteBooking(id)
+}
 
-	return nil
+func (s *bookingService) ResetBookings() error {
+	return s.repo.ResetBookings()
 }

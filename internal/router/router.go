@@ -73,6 +73,11 @@ func NewRouter() http.Handler {
 				r.Put("/{id}", bookingHandler.UpdateBooking)
 				r.Delete("/{id}", bookingHandler.DeleteBooking)
 			})
+			r.Group(func(r chi.Router) {
+				r.Use(userAuthHandler.Authenticate)
+				r.Use(userAuthHandler.RequireAdmin)
+				r.Delete("/reset", bookingHandler.ResetBookings)
+			})
 		})
 
 		// Location routes
@@ -90,7 +95,7 @@ func NewRouter() http.Handler {
 
 		// User routes
 		r.Route("/users", func(r chi.Router) {
-			r.Post("/", userHandler.CreateUser) // Keep this public for user registration
+			r.Post("/", userHandler.CreateUser)
 			r.Group(func(r chi.Router) {
 				r.Use(userAuthHandler.Authenticate)
 				r.Get("/{id}", userHandler.GetUserByID)
@@ -124,7 +129,7 @@ func NewRouter() http.Handler {
 
 	// Swagger documentation
 	r.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("/docs/swagger.json"), // Matches the expected URL
+		httpSwagger.URL("/docs/swagger.json"),
 	))
 	r.Handle("/docs/*", http.StripPrefix("/docs", http.FileServer(http.Dir("./docs"))))
 
