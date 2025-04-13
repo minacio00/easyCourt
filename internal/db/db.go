@@ -6,6 +6,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/minacio00/easyCourt/internal/model"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -43,14 +44,11 @@ func Init() {
 		if err != nil {
 			log.Fatalf("failed to connect to the database: %v", err)
 		}
-		// if err := DB.AutoMigrate(
-		// 	&model.User{},
-		// 	&model.Location{},
-		// 	&model.Court{}, &model.Timeslot{}, &model.Booking{},
-		// ); err != nil {
-		// 	log.Fatalf("AutoMigrate failed: %v", err)
-		// }
-
+		if err := DB.AutoMigrate(
+			&model.Location{}, &model.Court{},
+		); err != nil {
+			log.Fatalf("AutoMigrate failed: %v", err)
+		}
 	})
 }
 
