@@ -15,7 +15,7 @@ type Booking struct {
 	TimeslotID      int       `json:"timeslot_id"`
 	BookingDate     time.Time `json:"booking_date"` // Date of the booking
 	IsSinglesGame   bool      `json:"singles_flag"`
-	Timeslot        Timeslot  `gorm:"foreignKey:TimeslotID" json:"ommitempty"`
+	Timeslot        Timeslot  `gorm:"foreignKey:TimeslotID" json:"omitempty"`
 }
 
 func (bk *Booking) Validate() error {
@@ -64,16 +64,46 @@ func (cb *CreateBooking) ConvertToBooking() *Booking {
 }
 
 type ReadBooking struct {
-	ID              int          `gorm:"primaryKey" json:"id"`
-	UserID          int          `json:"user_id"`
-	User            User         `json:"user"`
-	Opponent        string       `json:"opponent_name"`
-	Partner         *string      `json:"partner_name"`
-	OpponentPartner *string      `json:"opponent_partner"`
-	TimeslotID      int          `json:"timeslot_id"`
-	Timeslot        ReadTimeslot `json:"timeslot"`
-	BookingDate     time.Time    `json:"booking_date"`
-	IsSinglesGame   bool         `json:"singles_flag"`
+	ID              int           `gorm:"primaryKey" json:"id"`
+	UserID          int           `json:"user_id"`
+	User            User          `json:"user"`
+	Opponent        string        `json:"opponent_name"`
+	Partner         *string       `json:"partner_name"`
+	OpponentPartner *string       `json:"opponent_partner"`
+	TimeslotID      int           `json:"timeslot_id"`
+	Timeslot        *ReadTimeslot `json:"timeslot,omitempty"`
+	BookingDate     time.Time     `json:"booking_date"`
+	IsSinglesGame   bool          `json:"singles_flag"`
+}
+
+func (b *ReadBooking) ToBooking() *Booking {
+	return &Booking{
+		ID:              b.ID,
+		User:            b.User,
+		Opponent:        b.Opponent,
+		Partner:         b.Partner,
+		OpponentPartner: b.OpponentPartner,
+		BookingDate:     b.BookingDate,
+		IsSinglesGame:   b.IsSinglesGame,
+		TimeslotID:      b.TimeslotID,
+	}
+}
+
+func (b *Booking) ToResponse() *ReadBooking {
+	if b != nil {
+		return &ReadBooking{
+			ID:              b.ID,
+			User:            b.User,
+			UserID:          b.UserID,
+			Opponent:        b.Opponent,
+			Partner:         b.Partner,
+			OpponentPartner: b.OpponentPartner,
+			BookingDate:     b.BookingDate,
+			IsSinglesGame:   b.IsSinglesGame,
+			TimeslotID:      b.TimeslotID,
+		}
+	}
+	return nil
 }
 
 func (b *ReadBooking) ToBooking() *Booking {
