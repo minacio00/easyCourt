@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -25,8 +26,7 @@ type Timeslot struct {
 	StartTime time.Time `json:"start_time" gorm:"type:time"`
 	EndTime   time.Time `json:"end_time" gorm:"type:time"`
 	IsActive  bool      `json:"is_active"`
-	// Define how GORM should fetch related bookings
-	Booking *Booking `gorm:"-" json:"booking,omitempty"` // Use gorm:"-" to exclude from DB operations
+	Booking   *Booking  `json:"booking,omitempty"`
 }
 
 func (t *Timeslot) Validate() error {
@@ -52,6 +52,9 @@ func (t *Timeslot) Validate() error {
 	return nil
 }
 
+func (t *Timeslot) ToReadTimeslot() {
+}
+
 type CreateTimeslot struct {
 	CourtID   *int    `json:"court_id"`
 	Day       Weekday `json:"week_day"`
@@ -61,12 +64,20 @@ type CreateTimeslot struct {
 }
 
 func (c *CreateTimeslot) ConvertCreateTimeslotToTimeslot() (*Timeslot, error) {
-	startTime, err := time.Parse("15:04:05", c.StartTime)
+	fmt.Println(c.StartTime)
+	startTime, err := time.Parse(time.TimeOnly, c.StartTime)
+	fmt.Println(startTime)
 	if err != nil {
 		return nil, fmt.Errorf("invalid start_time format: %v", err)
 	}
+	fmt.Printf("endtime: %v \n", c.EndTime)
 	endTime, err := time.Parse("15:04:05", c.EndTime)
+	fmt.Printf("endtime var: %v \n", endTime)
+
+	fmt.Println(err)
+
 	if err != nil {
+		fmt.Println("errored during conversion")
 		return nil, fmt.Errorf("invalid end_time format: %v", err)
 	}
 	return &Timeslot{
@@ -90,12 +101,16 @@ type ReadTimeslot struct {
 }
 
 func (rt *ReadTimeslot) ToTimeslot() (*Timeslot, error) {
-	startTime, err := time.Parse("15:04:05", rt.StartTime)
+	parserdStart, err := time.Parse(time.RFC3339, rt.StartTime)
 	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Println("Error Parsing  startTime:", rt.StartTime)
 		return nil, fmt.Errorf("invalid start_time format: %v", err)
 	}
-	endTime, err := time.Parse("15:04:05", rt.EndTime)
+	parserdEnd, err := time.Parse(time.RFC3339, rt.EndTime)
 	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Println("Error Parsing  endTime:", rt.StartTime)
 		return nil, fmt.Errorf("invalid end_time format: %v", err)
 	}
 
@@ -104,20 +119,16 @@ func (rt *ReadTimeslot) ToTimeslot() (*Timeslot, error) {
 		CourtID:   rt.CourtID,
 		Court:     rt.Court,
 		Day:       rt.Day,
-		StartTime: startTime,
-		EndTime:   endTime,
+		StartTime: parserdStart,
+		EndTime:   parserdEnd,
 		IsActive:  rt.IsActive,
 	}
 
-	// Convert ReadBooking to Booking if it exists
 	if rt.Booking != nil {
-		// This would need proper implementation depending on your model structure
-		// For now, just assign it directly
 		booking := &Booking{
 			ID:         rt.Booking.ID,
 			UserID:     rt.Booking.UserID,
 			TimeslotID: rt.ID,
-			// Map other fields as needed
 		}
 		ts.Booking = booking
 	}
