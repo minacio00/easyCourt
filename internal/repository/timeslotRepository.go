@@ -85,10 +85,17 @@ func (r *timeslotRepository) CreateTimeslot(timeslot *model.Timeslot) error {
 
 func (r *timeslotRepository) GetTimeslotByID(id int) (*model.ReadTimeslot, error) {
 	var timeslot model.ReadTimeslot
-
-	// First get the timeslot with its court
 	err := r.db.Table("timeslots").
-		Select("timeslots.*, courts.*").
+		Select(`
+            timeslots.id,
+            timeslots.court_id,
+            timeslots.day,
+            timeslots.start_time,
+            timeslots.end_time,
+            timeslots.is_active,
+            courts.id AS court__id,
+            courts.name AS court__name
+        `).
 		Joins("LEFT JOIN courts ON timeslots.court_id = courts.id").
 		Where("timeslots.id = ?", id).
 		Scan(&timeslot).Error
@@ -170,7 +177,7 @@ func (r *timeslotRepository) GetAllTimeslots() ([]model.ReadTimeslot, error) {
 }
 
 func (r *timeslotRepository) UpdateTimeslot(timeslot *model.Timeslot) error {
-	return r.db.Model(&model.Timeslot{}).Where("id = ?", timeslot.ID).Updates(map[string]interface{}{
+	return r.db.Debug().Model(&model.Timeslot{}).Where("id = ?", timeslot.ID).Updates(map[string]interface{}{
 		"court_id":   timeslot.CourtID,
 		"day":        timeslot.Day,
 		"start_time": timeslot.StartTime,

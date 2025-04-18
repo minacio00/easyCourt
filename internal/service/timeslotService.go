@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/minacio00/easyCourt/internal/model"
 	"github.com/minacio00/easyCourt/internal/model/utils"
@@ -99,8 +100,14 @@ func (s *timeslotService) UpdateTimeslot(timeslot *model.Timeslot) error {
 	ts.StartTime = timeslot.StartTime
 	ts.EndTime = timeslot.EndTime
 	ts.IsActive = timeslot.IsActive
+	err = s.repo.UpdateTimeslot(ts)
+	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Println("error during update timeslot: ", err)
+		return err
+	}
 
-	return s.repo.UpdateTimeslot(ts)
+	return nil
 }
 
 func (s *timeslotService) DeleteTimeslot(id int) error {
