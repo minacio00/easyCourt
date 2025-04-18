@@ -61,6 +61,7 @@ func (s *userService) ValidateAccessToken(tokenstr string) (uint, error) {
 	}
 	return 0, errors.New("invalid token")
 }
+
 func (s *userService) IsUserAdmin(userID uint) (bool, error) {
 	user, err := s.GetUserByID(userID)
 	if err != nil {
@@ -68,6 +69,7 @@ func (s *userService) IsUserAdmin(userID uint) (bool, error) {
 	}
 	return user.IsAdmin, nil
 }
+
 func (s *userService) CreateUser(user *model.User) error {
 	if err := user.Validate(); err != nil {
 		return err
@@ -122,6 +124,7 @@ func (s *userService) Authenticate(phone, password string) (*model.User, string,
 
 	return user, accessToken, refreshToken, nil
 }
+
 func (s *userService) generateToken(userID uint, tokenType string, expiration time.Duration) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,

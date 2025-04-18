@@ -33,10 +33,11 @@ func (s *timeslotService) GetTimeslotsByCourt(courtID int, weekDay string) ([]mo
 	if err != nil {
 		return nil, err
 	}
-	//todo: parse weekDay string
+	// todo: parse weekDay string
 	// If the court exists, get its timeslots
 	return s.repo.GetTimeslotsByCourt(courtID, weekDay)
 }
+
 func (s *timeslotService) CreateTimeslot(timeslot *model.Timeslot) error {
 	if err := timeslot.Validate(); err != nil {
 		return err
@@ -47,7 +48,7 @@ func (s *timeslotService) CreateTimeslot(timeslot *model.Timeslot) error {
 		return err
 	}
 
-	//check if the court exist in the db
+	// check if the court exist in the db
 	_, err = s.courtRepo.GetCourtByID(*timeslot.CourtID)
 	if err != nil {
 		return fmt.Errorf("court with id %d does not exist: %w", *timeslot.CourtID, err)
@@ -85,7 +86,7 @@ func (s *timeslotService) UpdateTimeslot(timeslot *model.Timeslot) error {
 	// Check if the timeslot exists
 	existingTimeslot, err := s.repo.GetTimeslotByID(timeslot.ID)
 	if err != nil {
-		return fmt.Errorf("timeslot with id %d does not exist: %w", timeslot.ID, err)
+		return fmt.Errorf("timeslot with id %d returned error: %w", timeslot.ID, err)
 	}
 	ts, err := existingTimeslot.ToTimeslot()
 	if err != nil {
