@@ -52,7 +52,19 @@ func (t *Timeslot) Validate() error {
 	return nil
 }
 
-func (t *Timeslot) ToReadTimeslot() {
+func (t *Timeslot) ToReadTimeslot() (*ReadTimeslot, error) {
+	startTime := t.StartTime.Format(time.TimeOnly)
+	endtime := t.EndTime.Format(time.TimeOnly)
+	return &ReadTimeslot{
+		ID:        t.ID,
+		CourtID:   t.CourtID,
+		StartTime: startTime,
+		EndTime:   endtime,
+		Day:       t.Day,
+		Court:     t.Court,
+		IsActive:  t.IsActive,
+		Booking:   t.Booking.ToResponse(),
+	}, nil
 }
 
 type CreateTimeslot struct {

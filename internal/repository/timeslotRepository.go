@@ -14,7 +14,7 @@ type TimeslotRepository interface {
 	UpdateTimeslot(timeslot *model.Timeslot) error
 	DeleteTimeslot(id int) error
 	GetActiveTimeslots() ([]model.Timeslot, error)
-	GetTimeslotsByCourt(courtID int, weekDay string) ([]model.ReadTimeslot, error)
+	GetTimeslotsByCourt(courtID int, weekDay string) ([]model.Timeslot, error)
 	GetTimeslotByBookingId(bookingId uint) (*model.ReadTimeslot, error)
 }
 
@@ -37,43 +37,33 @@ func (r *timeslotRepository) GetTimeslotByBookingId(bookingId uint) (*model.Read
 	return r.GetTimeslotByID(booking.TimeslotID)
 }
 
-func (r *timeslotRepository) GetTimeslotsByCourt(courtID int, weekDay string) ([]model.ReadTimeslot, error) {
-	// First fetch all timeslots matching the criteria
-	var timeslots []model.ReadTimeslot
+func (r *timeslotRepository) GetTimeslotsByCourt(courtID int, weekDay string) ([]model.Timeslot, error) {
+	var timeslots []model.Timeslot
 	query := r.db.Table("timeslots").
 		Select(`
-	timeslots.*, 
-    courts.id AS court_id,
-    courts.name,
-    courts.created_at,
-    courts.updated_at
-`).
+            timeslots.*,
+            courts.id AS "court_id",
+            courts.name AS "court_name",
+            bookings.id AS "booking_id",
+            bookings.user_id AS "booking_user_id",
+            users.id AS "user_id",
+            users.name AS "user_name",
+            users.email AS "user_email"
+        `).
 		Joins("LEFT JOIN courts ON timeslots.court_id = courts.id").
+		Joins("LEFT JOIN bookings ON timeslots.id = bookings.timeslot_id").
+		Joins("LEFT JOIN users ON bookings.user_id = users.id").
 		Where("timeslots.court_id = ?", courtID)
 
 	if weekDay != "" {
 		query = query.Where("timeslots.day = ?", weekDay)
-	} else {
-		query = query.Order("timeslots.day ASC")
 	}
 
-	if err := query.Order("timeslots.start_time ASC").Scan(&timeslots).Error; err != nil {
+	err := query.
+		Order("timeslots.day ASC, timeslots.start_time ASC").
+		Scan(&timeslots).Error
+	if err != nil {
 		return nil, err
-	}
-
-	// For each timeslot, we need to fetch the associated booking (if any)
-	for i := range timeslots {
-		var booking model.ReadBooking
-		err := r.db.Table("bookings").
-			Select("bookings.*, users.*").
-			Joins("LEFT JOIN users ON bookings.user_id = users.id").
-			Where("bookings.timeslot_id = ?", timeslots[i].ID).
-			Scan(&booking).Error
-
-		// Only assign the booking if one was found
-		if err == nil && booking.ID != 0 {
-			timeslots[i].Booking = &booking
-		}
 	}
 
 	return timeslots, nil

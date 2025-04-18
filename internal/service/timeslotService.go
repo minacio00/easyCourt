@@ -34,9 +34,18 @@ func (s *timeslotService) GetTimeslotsByCourt(courtID int, weekDay string) ([]mo
 	if err != nil {
 		return nil, err
 	}
-	// todo: parse weekDay string
-	// If the court exists, get its timeslots
-	return s.repo.GetTimeslotsByCourt(courtID, weekDay)
+	slots, err := s.repo.GetTimeslotsByCourt(courtID, weekDay)
+	if err != nil {
+		return nil, err
+	}
+	var readtimeslots []model.ReadTimeslot
+
+	for _, ts := range slots {
+		rts, _ := ts.ToReadTimeslot()
+		readtimeslots = append(readtimeslots, *rts)
+	}
+
+	return readtimeslots, nil
 }
 
 func (s *timeslotService) CreateTimeslot(timeslot *model.Timeslot) error {
