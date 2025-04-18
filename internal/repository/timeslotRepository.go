@@ -39,21 +39,29 @@ func (r *timeslotRepository) GetTimeslotByBookingId(bookingId uint) (*model.Read
 
 func (r *timeslotRepository) GetTimeslotsByCourt(courtID int, weekDay string) ([]model.Timeslot, error) {
 	var timeslots []model.Timeslot
-
-
-	query := r.db.Debug().
-		Preload("Court").
-		Preload("Booking.User").
-		Where("court_id = ?", courtID)
+	query := r.db.Table("timeslots").
+		Select(`
+            timeslots.*,
+            courts.id AS "court_id",
+            courts.name AS "court_name",
+            bookings.id AS "booking_id",
+            bookings.user_id AS "booking_user_id",
+            users.id AS "user_id",
+            users.name AS "user_name",
+            users.email AS "user_email"
+        `).
+		Joins("LEFT JOIN courts ON timeslots.court_id = courts.id").
+		Joins("LEFT JOIN bookings ON timeslots.id = bookings.timeslot_id").
+		Joins("LEFT JOIN users ON bookings.user_id = users.id").
+		Where("timeslots.court_id = ?", courtID)
 
 	if weekDay != "" {
-		query = query.Where("day = ?", weekDay)
+		query = query.Where("timeslots.day = ?", weekDay)
 	}
 
 	err := query.
-		Order("day ASC, start_time ASC").
-		Find(&timeslots).Error
-
+		Order("timeslots.day ASC, timeslots.start_time ASC").
+		Scan(&timeslots).Error
 	if err != nil {
 		return nil, err
 	}
