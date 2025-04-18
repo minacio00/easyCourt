@@ -15,6 +15,7 @@ type Booking struct {
 	TimeslotID      int       `json:"timeslot_id"`
 	BookingDate     time.Time `json:"booking_date"` // Date of the booking
 	IsSinglesGame   bool      `json:"singles_flag"`
+	Timeslot        Timeslot  `gorm:"foreignKey:TimeslotID" json:"ommitempty"`
 }
 
 func (bk *Booking) Validate() error {

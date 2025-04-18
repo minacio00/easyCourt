@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -181,6 +182,7 @@ func (h *timeSlotHandler) UpdateTimeslot(w http.ResponseWriter, r *http.Request)
 	slot.ID = id // Set the ID from the URL param
 
 	if err := h.service.UpdateTimeslot(slot); err != nil {
+		fmt.Println("error during update")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return

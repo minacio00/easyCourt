@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"log"
+
 	"github.com/minacio00/easyCourt/internal/model"
 	"gorm.io/gorm"
 )
@@ -83,16 +85,26 @@ func (r *timeslotRepository) CreateTimeslot(timeslot *model.Timeslot) error {
 
 func (r *timeslotRepository) GetTimeslotByID(id int) (*model.ReadTimeslot, error) {
 	var timeslot model.ReadTimeslot
-
-	// First get the timeslot with its court
 	err := r.db.Table("timeslots").
-		Select("timeslots.*, courts.*").
+		Select(`
+            timeslots.id,
+            timeslots.court_id,
+            timeslots.day,
+            timeslots.start_time,
+            timeslots.end_time,
+            timeslots.is_active,
+            courts.id AS court__id,
+            courts.name AS court__name
+        `).
 		Joins("LEFT JOIN courts ON timeslots.court_id = courts.id").
 		Where("timeslots.id = ?", id).
 		Scan(&timeslot).Error
-
 	if err != nil {
+		log.Println("error in gettimeslotbyid repo ", err)
 		return nil, err
+	}
+	if timeslot.ID == 0 {
+		return nil, nil
 	}
 
 	// Then get any associated booking
@@ -112,38 +124,60 @@ func (r *timeslotRepository) GetTimeslotByID(id int) (*model.ReadTimeslot, error
 }
 
 func (r *timeslotRepository) GetAllTimeslots() ([]model.ReadTimeslot, error) {
-	var timeslots []model.ReadTimeslot
+	var timeslots []model.Timeslot
+	var readSlots []model.ReadTimeslot
 
-	// First get all timeslots with their courts
-	err := r.db.Table("timeslots").
-		Select("timeslots.*, courts.*").
-		Joins("LEFT JOIN courts ON timeslots.court_id = courts.id").
-		Scan(&timeslots).Error
+	log.Println("got here")
 
+	err := r.db.Preload("Court").
+		Preload("Booking.User").
+		Find(&timeslots).Error
 	if err != nil {
+		log.Println("error after db load ", err)
 		return nil, err
 	}
 
-	// For each timeslot, check if there's an associated booking
-	for i := range timeslots {
-		var booking model.ReadBooking
-		err = r.db.Table("bookings").
-			Select("bookings.*, users.*").
-			Joins("LEFT JOIN users ON bookings.user_id = users.id").
-			Where("bookings.timeslot_id = ?", timeslots[i].ID).
-			Scan(&booking).Error
-
-		// Only assign the booking if one was found
-		if err == nil && booking.ID != 0 {
-			timeslots[i].Booking = &booking
-		}
+	if len(timeslots) == 0 {
+		return nil, gorm.ErrRecordNotFound
 	}
 
-	return timeslots, nil
+	for _, ts := range timeslots {
+		readSlot := model.ReadTimeslot{
+			ID:        ts.ID,
+			CourtID:   ts.CourtID,
+			Court:     ts.Court,
+			Day:       ts.Day,
+			StartTime: ts.StartTime.Format("15:04:05"),
+			EndTime:   ts.EndTime.Format("15:04:05"),
+			IsActive:  ts.IsActive,
+		}
+
+		if ts.Booking != nil {
+			readSlot.Booking = &model.ReadBooking{
+				ID:              ts.Booking.ID,
+				UserID:          ts.Booking.UserID,
+				Opponent:        ts.Booking.Opponent,
+				OpponentPartner: ts.Booking.OpponentPartner,
+				BookingDate:     ts.Booking.BookingDate,
+				IsSinglesGame:   ts.Booking.IsSinglesGame,
+				TimeslotID:      ts.Booking.TimeslotID,
+
+				User: model.User{
+					ID:    ts.Booking.User.ID,
+					Name:  ts.Booking.User.Name,
+					Email: ts.Booking.User.Email,
+				},
+			}
+		}
+
+		readSlots = append(readSlots, readSlot)
+	}
+
+	return readSlots, nil
 }
 
 func (r *timeslotRepository) UpdateTimeslot(timeslot *model.Timeslot) error {
-	return r.db.Model(&model.Timeslot{}).Where("id = ?", timeslot.ID).Updates(map[string]interface{}{
+	return r.db.Debug().Model(&model.Timeslot{}).Where("id = ?", timeslot.ID).Updates(map[string]interface{}{
 		"court_id":   timeslot.CourtID,
 		"day":        timeslot.Day,
 		"start_time": timeslot.StartTime,
