@@ -40,6 +40,7 @@ func (r *timeslotRepository) GetTimeslotByBookingId(bookingId uint) (*model.Read
 func (r *timeslotRepository) GetTimeslotsByCourt(courtID int, weekDay string) ([]model.Timeslot, error) {
 	var timeslots []model.Timeslot
 
+
 	query := r.db.Debug().
 		Preload("Court").
 		Preload("Booking.User").
@@ -52,6 +53,7 @@ func (r *timeslotRepository) GetTimeslotsByCourt(courtID int, weekDay string) ([
 	err := query.
 		Order("day ASC, start_time ASC").
 		Find(&timeslots).Error
+
 	if err != nil {
 		return nil, err
 	}

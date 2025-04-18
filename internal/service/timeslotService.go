@@ -41,6 +41,7 @@ func (s *timeslotService) GetTimeslotsByCourt(courtID int, weekDay string) ([]mo
 	var readtimeslots []model.ReadTimeslot
 
 	for _, ts := range slots {
+
 		if ts.Booking != nil {
 			log.Println("bookings present", ts.Booking)
 		}

@@ -105,3 +105,32 @@ func (b *Booking) ToResponse() *ReadBooking {
 	}
 	return nil
 }
+
+func (b *ReadBooking) ToBooking() *Booking {
+	return &Booking{
+		ID:              b.ID,
+		User:            b.User,
+		Opponent:        b.Opponent,
+		Partner:         b.Partner,
+		OpponentPartner: b.OpponentPartner,
+		BookingDate:     b.BookingDate,
+		IsSinglesGame:   b.IsSinglesGame,
+		TimeslotID:      b.TimeslotID,
+	}
+}
+
+func (b *Booking) ToResponse() *ReadBooking {
+	if b != nil {
+		return &ReadBooking{
+			ID:              b.ID,
+			User:            b.User,
+			Opponent:        b.Opponent,
+			Partner:         b.Partner,
+			OpponentPartner: b.OpponentPartner,
+			BookingDate:     b.BookingDate,
+			IsSinglesGame:   b.IsSinglesGame,
+			TimeslotID:      b.TimeslotID,
+		}
+	}
+	return nil
+}
