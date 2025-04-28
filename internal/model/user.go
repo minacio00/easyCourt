@@ -23,10 +23,10 @@ type User struct {
 func (u *User) Validate() error {
 	// Validate Name
 	if strings.TrimSpace(u.Name) == "" {
-		return errors.New("name cannot be empty")
+		return errors.New("nome não deve ser vazio")
 	}
 	if len(u.Name) < 2 || len(u.Name) > 50 {
-		return errors.New("name must be between 2 and 50 characters")
+		return errors.New("nome deve ter entre 2 e 50 carateres")
 	}
 
 	// Validate Phone
