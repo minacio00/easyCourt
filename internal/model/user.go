@@ -46,6 +46,16 @@ func (u *User) Validate() error {
 	return nil
 }
 
+func validateEmail(email string) error {
+	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-/&()]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+
+	if !emailRegex.MatchString(email) {
+		return errors.New("email deve ter o formato 'exemplo@dominio.com'")
+	}
+
+	return nil
+}
+
 func validatePhone(phone string) error {
 	phoneRegex := regexp.MustCompile(`^(\d{2})(\d{8,9})$`)
 
