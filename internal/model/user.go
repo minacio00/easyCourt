@@ -33,6 +33,9 @@ func (u *User) Validate() error {
 	if err := validatePhone(u.Phone); err != nil {
 		return err
 	}
+	if err := validateEmail(u.Email); err != nil {
+		return err
+	}
 
 	// Validate Password (only if it's being set or updated)
 	if u.Password == "" {
@@ -40,7 +43,7 @@ func (u *User) Validate() error {
 	}
 	if u.Password != "" {
 		if len(u.Password) < 5 {
-			return errors.New("senha deve ter ao menos 6 carateres")
+			return errors.New("senha deve ter ao menos 6 caracteres")
 		}
 	}
 	return nil
@@ -72,7 +75,6 @@ func validatePhone(phone string) error {
 		return errors.New("DDD deve conter 2 dígitos")
 	}
 
-	// Validate number length (8 digits for landlines, 9 for mobile)
 	if len(number) != 8 && len(number) != 9 {
 		return errors.New("número deve conter ou 9 dígitos após o ddd")
 	}
