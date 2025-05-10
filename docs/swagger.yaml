@@ -215,9 +215,9 @@ definitions:
     type: object
   internal_handler.Credentials:
     properties:
-      password:
+      identification:
         type: string
-      phone:
+      password:
         type: string
     type: object
   internal_handler.Refresh:

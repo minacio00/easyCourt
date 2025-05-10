@@ -16,6 +16,7 @@ type BookingRepository interface {
 	DeleteBooking(id int) error
 	CheckTimeslotAvailability(booking *model.Booking) error
 	ResetBookings() error
+	GetUserBookings(userId int, limit, offset int) (*[]model.ReadBooking, error)
 }
 
 type bookingRepository struct {
@@ -84,6 +85,31 @@ func (r *bookingRepository) GetBookingByID(id int) (*model.ReadBooking, error) {
 		return nil, err
 	}
 	return &booking, nil
+}
+
+func (r *bookingRepository) GetUserBookings(userId int, limit, offset int) (*[]model.ReadBooking, error) {
+	var bookings []model.ReadBooking
+
+	query := r.db.
+		Preload("User").
+		Preload("Timeslot").
+		Where("user_id = ?", userId)
+	if limit > 0 {
+		query = query.Limit(limit)
+	}
+
+	if offset > 0 {
+		query = query.Offset(offset)
+	}
+	result := query.Find(&bookings)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return &[]model.ReadBooking{}, nil
+	}
+	return &bookings, nil
 }
 
 func (r *bookingRepository) GetAllBookings(limit, offset int) (*[]model.ReadBooking, error) {

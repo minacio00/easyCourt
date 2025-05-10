@@ -1601,10 +1601,10 @@ const docTemplate = `{
         "internal_handler.Credentials": {
             "type": "object",
             "properties": {
-                "password": {
+                "identification": {
                     "type": "string"
                 },
-                "phone": {
+                "password": {
                     "type": "string"
                 }
             }
