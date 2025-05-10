@@ -14,6 +14,8 @@ definitions:
         type: string
       id:
         type: integer
+      omitempty:
+        $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot'
       opponent_name:
         type: string
       opponent_partner:
@@ -23,12 +25,10 @@ definitions:
       singles_flag:
         type: boolean
       timeslot_id:
-        description: Foreign key to Timeslot
         type: integer
       user:
         $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.User'
       user_id:
-        description: Foreign key to User
         type: integer
     type: object
   github_com_minacio00_easyCourt_internal_model.Court:
@@ -83,8 +83,12 @@ definitions:
     type: object
   github_com_minacio00_easyCourt_internal_model.CreateUser:
     properties:
+      email:
+        type: string
       id:
         type: integer
+      lastName:
+        type: string
       name:
         type: string
       password:
@@ -133,9 +137,9 @@ definitions:
   github_com_minacio00_easyCourt_internal_model.ReadTimeslot:
     properties:
       booking:
-        $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Booking'
-      booking_id:
-        type: integer
+        $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.ReadBooking'
+      court:
+        $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Court'
       court_id:
         type: integer
       end_time:
@@ -153,8 +157,6 @@ definitions:
     properties:
       booking:
         $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Booking'
-      booking_id:
-        type: integer
       court:
         $ref: '#/definitions/github_com_minacio00_easyCourt_internal_model.Court'
       court_id:
@@ -172,10 +174,14 @@ definitions:
     type: object
   github_com_minacio00_easyCourt_internal_model.User:
     properties:
+      email:
+        type: string
       id:
         type: integer
       isAdmin:
         type: boolean
+      lastName:
+        type: string
       name:
         type: string
       phone:
