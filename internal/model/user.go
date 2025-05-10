@@ -23,14 +23,17 @@ type User struct {
 func (u *User) Validate() error {
 	// Validate Name
 	if strings.TrimSpace(u.Name) == "" {
-		return errors.New("name cannot be empty")
+		return errors.New("nome não deve ser vazio")
 	}
 	if len(u.Name) < 2 || len(u.Name) > 50 {
-		return errors.New("name must be between 2 and 50 characters")
+		return errors.New("nome deve ter entre 2 e 50 carateres")
 	}
 
 	// Validate Phone
 	if err := validatePhone(u.Phone); err != nil {
+		return err
+	}
+	if err := validateEmail(u.Email); err != nil {
 		return err
 	}
 
@@ -40,9 +43,19 @@ func (u *User) Validate() error {
 	}
 	if u.Password != "" {
 		if len(u.Password) < 5 {
-			return errors.New("senha deve ter ao menos 6 carateres")
+			return errors.New("senha deve ter ao menos 6 caracteres")
 		}
 	}
+	return nil
+}
+
+func validateEmail(email string) error {
+	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-/&()]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+
+	if !emailRegex.MatchString(email) {
+		return errors.New("email deve ter o formato 'exemplo@dominio.com'")
+	}
+
 	return nil
 }
 
@@ -62,7 +75,6 @@ func validatePhone(phone string) error {
 		return errors.New("DDD deve conter 2 dígitos")
 	}
 
-	// Validate number length (8 digits for landlines, 9 for mobile)
 	if len(number) != 8 && len(number) != 9 {
 		return errors.New("número deve conter ou 9 dígitos após o ddd")
 	}

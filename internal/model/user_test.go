@@ -2,7 +2,52 @@ package model
 
 import (
 	"testing"
+
+	"github.com/fatih/color"
 )
+
+func init() {
+	color.NoColor = false
+}
+
+func TestValidadeEmail(t *testing.T) {
+	red := color.New(color.FgRed).SprintFunc()
+	green := color.New(color.FgGreen).SprintFunc()
+	testCases := []struct {
+		name      string
+		email     string
+		expectErr bool
+		errText   string
+	}{
+		{
+			name:      "Invalid Email",
+			email:     "@.com",
+			expectErr: true,
+			errText:   "email deve ter o formato 'exemplo@dominio.com'",
+		},
+		{
+			name:      "Valid Email with & char",
+			email:     "testemail&@text.com",
+			expectErr: false,
+			errText:   "",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := validateEmail(tc.email)
+			if err != nil && !tc.expectErr {
+				t.Errorf(red("unexpected error %v"), err)
+			}
+			if err == nil && tc.expectErr {
+				t.Errorf(red("unexpected error %v"), err)
+			}
+			if !tc.expectErr && err == nil {
+				t.Logf(green("PASS: %s"), tc.name)
+			}
+		})
+	}
+}
 
 func TestValidate(t *testing.T) {
 	testeCases := []struct {

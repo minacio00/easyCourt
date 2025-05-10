@@ -49,7 +49,6 @@ func NewRouter() http.Handler {
 
 	// Define routes
 	r.Route("/api/v1", func(r chi.Router) {
-
 		r.Route("/timeslots", func(r chi.Router) {
 			r.Get("/{id}", timeslotHandler.GetTimeslotByID)
 			r.Get("/by-court", timeslotHandler.GetTimeslotsByCourt)
@@ -97,6 +96,7 @@ func NewRouter() http.Handler {
 		r.Route("/users", func(r chi.Router) {
 			r.Post("/", userHandler.CreateUser)
 			r.Group(func(r chi.Router) {
+				// r.use(userHandler.ForgotPassword)
 				r.Use(userAuthHandler.Authenticate)
 				r.Get("/{id}", userHandler.GetUserByID)
 				r.Group(func(r chi.Router) {

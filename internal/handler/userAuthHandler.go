@@ -19,8 +19,8 @@ func NewUserAuthHandler(service service.UserService) *UserAuthHandler {
 }
 
 type Credentials struct {
-	Phone    string `json:"phone"`
-	Password string `json:"password"`
+	Identification string `json:"identification"`
+	Password       string `json:"password"`
 }
 
 type Refresh struct {
@@ -44,10 +44,10 @@ func (h *UserAuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, token, refresh, err := h.service.Authenticate(credentials.Phone, credentials.Password)
+	_, token, refresh, err := h.service.Authenticate(credentials.Identification, credentials.Password)
 	if err != nil {
 		println(err.Error())
-		http.Error(w, "Invalid phone or password", http.StatusUnauthorized)
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
@@ -94,6 +94,7 @@ func (h *UserAuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 		"refresh_token": newRefreshToken,
 	})
 }
+
 func (h *UserAuthHandler) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")

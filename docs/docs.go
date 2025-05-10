@@ -1300,6 +1300,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "omitempty": {
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Timeslot"
+                },
                 "opponent_name": {
                     "type": "string"
                 },
@@ -1313,14 +1316,12 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "timeslot_id": {
-                    "description": "Foreign key to Timeslot",
                     "type": "integer"
                 },
                 "user": {
                     "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.User"
                 },
                 "user_id": {
-                    "description": "Foreign key to User",
                     "type": "integer"
                 }
             }
@@ -1405,8 +1406,14 @@ const docTemplate = `{
         "github_com_minacio00_easyCourt_internal_model.CreateUser": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
+                },
+                "lastName": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -1481,10 +1488,10 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "booking": {
-                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Booking"
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.ReadBooking"
                 },
-                "booking_id": {
-                    "type": "integer"
+                "court": {
+                    "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Court"
                 },
                 "court_id": {
                     "type": "integer"
@@ -1512,9 +1519,6 @@ const docTemplate = `{
                 "booking": {
                     "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Booking"
                 },
-                "booking_id": {
-                    "type": "integer"
-                },
                 "court": {
                     "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.Court"
                 },
@@ -1541,11 +1545,17 @@ const docTemplate = `{
         "github_com_minacio00_easyCourt_internal_model.User": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
                 "isAdmin": {
                     "type": "boolean"
+                },
+                "lastName": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"

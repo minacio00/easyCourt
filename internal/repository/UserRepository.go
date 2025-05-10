@@ -9,7 +9,7 @@ type UserRepository interface {
 	CreateUser(user *model.User) error
 	GetUserByID(id uint) (*model.User, error)
 	GetUserByPhone(phone string) (*model.User, error)
-	GetAllUsers() ([]model.User, error)
+	GetAllUsers(user *model.User) ([]model.User, error)
 	UpdateUser(user *model.User) error
 	DeleteUser(id uint) error
 }
@@ -24,6 +24,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 func (r *userRepository) CreateUser(user *model.User) error {
 	return r.db.Create(user).Error
 }
+
 func (r *userRepository) GetUserByPhone(phone string) (*model.User, error) {
 	var user model.User
 	if err := r.db.Where("phone = ?", phone).First(&user).Error; err != nil {
@@ -31,6 +32,7 @@ func (r *userRepository) GetUserByPhone(phone string) (*model.User, error) {
 	}
 	return &user, nil
 }
+
 func (r *userRepository) GetUserByID(id uint) (*model.User, error) {
 	var user model.User
 	if err := r.db.First(&user, id).Error; err != nil {
@@ -39,9 +41,21 @@ func (r *userRepository) GetUserByID(id uint) (*model.User, error) {
 	return &user, nil
 }
 
-func (r *userRepository) GetAllUsers() ([]model.User, error) {
+func (r *userRepository) GetAllUsers(filter *model.User) ([]model.User, error) {
 	var users []model.User
-	if err := r.db.Find(&users).Error; err != nil {
+	query := r.db.Model(&model.User{})
+	if filter != nil {
+		conditions := make(map[string]interface{})
+
+		if filter.Phone != "" {
+			conditions["phone"] = filter.Phone
+		}
+		if filter.Email != "" {
+			conditions["email"] = filter.Email
+		}
+		query.Where(conditions)
+	}
+	if err := query.Find(&users).Error; err != nil {
 		return nil, err
 	}
 	return users, nil

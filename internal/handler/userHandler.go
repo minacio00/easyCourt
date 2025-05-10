@@ -44,8 +44,14 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
-
 	w.WriteHeader(http.StatusCreated)
+}
+
+func (h *UserHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	var body model.CreateUser
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
 }
 
 // GetUserByID retrieves a user by ID
