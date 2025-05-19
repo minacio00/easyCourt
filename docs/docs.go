@@ -1215,6 +1215,69 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/current_user_bookings": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieves bookings for the authenticated user with pagination support",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "Get user bookings",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Number of bookings to retrieve (default 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset for pagination (default 0)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_minacio00_easyCourt_internal_model.ReadBooking"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/users/{id}": {
             "get": {
                 "description": "Get details of a user by their ID",
@@ -1601,10 +1664,10 @@ const docTemplate = `{
         "internal_handler.Credentials": {
             "type": "object",
             "properties": {
-                "password": {
+                "identification": {
                     "type": "string"
                 },
-                "phone": {
+                "password": {
                     "type": "string"
                 }
             }

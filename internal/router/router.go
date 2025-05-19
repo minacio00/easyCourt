@@ -99,6 +99,7 @@ func NewRouter() http.Handler {
 				// r.use(userHandler.ForgotPassword)
 				r.Use(userAuthHandler.Authenticate)
 				r.Get("/{id}", userHandler.GetUserByID)
+				r.Get("/current_user_bookings", bookingHandler.GetUserBookings)
 				r.Group(func(r chi.Router) {
 					r.Use(userAuthHandler.RequireAdmin)
 					r.Get("/", userHandler.GetAllUsers)
