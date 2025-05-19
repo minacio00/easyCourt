@@ -90,9 +90,11 @@ func (r *bookingRepository) GetBookingByID(id int) (*model.ReadBooking, error) {
 func (r *bookingRepository) GetUserBookings(userId int, limit, offset int) (*[]model.ReadBooking, error) {
 	var bookings []model.ReadBooking
 
-	query := r.db.
+	query := r.db.Table("bookings").
 		Preload("User").
-		Preload("Timeslot").
+		Preload("Timeslot", func(db *gorm.DB) *gorm.DB {
+			return db.Table("timeslots")
+		}).
 		Where("user_id = ?", userId)
 	if limit > 0 {
 		query = query.Limit(limit)

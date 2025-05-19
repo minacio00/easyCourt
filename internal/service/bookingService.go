@@ -22,6 +22,7 @@ type BookingService interface {
 	CreateBooking(booking *model.Booking) error
 	GetBookingByID(id int) (*model.ReadBooking, error)
 	GetAllBookings(limit, offset int) (*[]model.ReadBooking, error)
+	GetUserBookings(userId int, limit, offset int) (*[]model.ReadBooking, error)
 	UpdateBooking(booking *model.Booking) error
 	DeleteBooking(id int) error
 	ResetBookings() error
@@ -35,6 +36,14 @@ type bookingService struct {
 
 func NewBookingService(repo repository.BookingRepository, user repository.UserRepository, timeslot repository.TimeslotRepository) BookingService {
 	return &bookingService{repo, user, timeslot}
+}
+
+func (s *bookingService) GetUserBookings(userId int, limit, offset int) (*[]model.ReadBooking, error) {
+	bookings, error := s.repo.GetUserBookings(userId, limit, offset)
+	if error != nil {
+		return nil, error
+	}
+	return bookings, nil
 }
 
 func (s *bookingService) CreateBooking(booking *model.Booking) error {

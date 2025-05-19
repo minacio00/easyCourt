@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -17,6 +18,67 @@ type BookingHandler struct {
 // NewBookingHandler initializes a new BookingHandler
 func NewBookingHandler(s service.BookingService) *BookingHandler {
 	return &BookingHandler{s}
+}
+
+// GetUserBookings godoc
+// @Summary      Get user bookings
+// @Description  Retrieves bookings for the authenticated user with pagination support
+// @Tags         bookings
+// @Accept       json
+// @Produce      json
+// @Param        limit  query int     false "Number of bookings to retrieve (default 10)"
+// @Param        offset query int     false "Offset for pagination (default 0)"
+// @Success      200    {array}       model.ReadBooking
+// @Failure      400    {string}      string "Invalid parameters"
+// @Failure      401    {string}      string "Unauthorized"
+// @Failure      500    {string}      string "Internal server error"
+// @Security     BearerAuth
+// @Router       /users/current_user_bookings [get]
+func (h *BookingHandler) GetUserBookings(w http.ResponseWriter, r *http.Request) {
+	userIDVal := r.Context().Value("user_id")
+	if userIDVal == nil {
+		http.Error(w, "Unauthorized: user ID not found", http.StatusUnauthorized)
+		return
+	}
+	str, ok := userIDVal.(uint)
+	if !ok {
+		log.Printf("Invalid user ID type: %T (value: %v)", userIDVal, userIDVal)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	userID := int(str)
+	limit := 10
+	if l := r.URL.Query().Get("limit"); l != "" {
+		parsed, err := strconv.Atoi(l)
+		if err != nil || parsed < 0 {
+			http.Error(w, "Invalid limit parameter", http.StatusBadRequest)
+			return
+		}
+		limit = parsed
+	}
+
+	offset := 0
+	if o := r.URL.Query().Get("offset"); o != "" {
+		parsed, err := strconv.Atoi(o)
+		if err != nil || parsed < 0 {
+			http.Error(w, "Invalid offset parameter", http.StatusBadRequest)
+			return
+		}
+		offset = parsed
+	}
+
+	bookings, err := h.service.GetUserBookings(userID, limit, offset)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(bookings); err != nil {
+		log.Println(err)
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 }
 
 // CreateBooking godoc
